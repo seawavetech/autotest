@@ -1,10 +1,10 @@
 import Router from 'koa-router'
 
+import TestAllCTRL from '../bin/controller/api/test_all';
+
 const router = new Router();
-const SavePageController = require('../bin/controller/api/save_page')
 
 router.prefix('/api/v1/');
-
-router.get('/save_page/:type/:ssn/:oid?',SavePageController.save)
+router.get('/test/all/:siteName?',TestAllCTRL.test)
 
 export default router
