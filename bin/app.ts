@@ -1,9 +1,11 @@
 import Koa from 'koa';
+import cors from 'koa2-cors';
 import views from 'koa-views';
 import json from 'koa-json';
 import onError from 'koa-onerror';
 import bodyparser from 'koa-bodyparser';
 import logger from 'koa-logger';
+import path from 'path';
 
 import index from '../routes/index';
 import api_v1 from '../routes/api_v1';
@@ -12,15 +14,17 @@ const app = new Koa()
 // error handler
 onError(app)
 
+app.use(cors());
+
 // middlewares
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
 }))
 app.use(json())
 app.use(logger())
-app.use(require('koa-static')(__dirname + '/public'))
+app.use(require('koa-static')(path.resolve(__dirname, '../public')));
 
-app.use(views(__dirname + '/views'))
+app.use(views(path.resolve(__dirname, '../views')));
 
 // logger
 app.use(async (ctx, next) => {
