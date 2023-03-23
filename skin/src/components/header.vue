@@ -1,6 +1,6 @@
 
 <template>
-    <div class="m">Auto Test for trade</div>
+    <div class="m"> <a href="/">Auto Test for trade</a> </div>
 </template>
 
 <script setup lang="ts">
@@ -18,5 +18,10 @@
     font-weight: bold;
     color: #fff;
     text-transform: capitalize;
+    a {
+        font-weight: bold;
+        color: inherit;
+        text-decoration: none;
+    }
 }
 </style>

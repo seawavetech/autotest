@@ -2,30 +2,36 @@
  * Module dependencies.
  */
 import app from './app';
-import Debug from 'debug';
+import WSCallBack from './ws';
+import { Server, Socket } from 'socket.io'
 import http from 'http';
 import * as env from 'dotenv';
+
+import Debug from 'debug';
 const debug = new Debug('demo:server');
 
 env.config()
 /**
  * Get port from environment and store in Express.
  */
-
-
 let port = normalizePort((process.env.port as string) || '3000');
-// app.set('port', port);
 
 console.log(`Port:${port}`)
+
 /**
  * Create HTTP server.
  */
 const server = http.createServer(app.callback());
+const io = new Server(server,{
+  cors:{},
+  path:'/ws/'
+});
+
+WSCallBack(io);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
@@ -34,7 +40,7 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+function normalizePort(val:string) {
   let port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -54,7 +60,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+function onError(error:{[key in string]:any}) {
   if (error.syscall !== 'listen') {
     throw error;
   }

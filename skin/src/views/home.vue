@@ -10,7 +10,7 @@ import {onMounted,inject} from 'vue';
 const $http = inject('$http');
 
 onMounted(()=>{
-    $http.testDadM_All()
+    // $http.testRequest()
 })
 
 </script>

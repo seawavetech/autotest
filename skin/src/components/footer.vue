@@ -1,4 +1,3 @@
-
 <template>
     <div class="m">footer abc</div>
 </template>
