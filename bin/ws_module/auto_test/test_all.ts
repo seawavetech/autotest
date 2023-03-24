@@ -1,15 +1,17 @@
 import puppeteer, { KnownDevices } from 'puppeteer';
+import { sleep } from '../../module/util'
 import path from 'path';
 import mkdirp from 'mkdirp';
 import moment from 'moment';
 import jquery from 'jquery';
+
 
 import siteList from './site';
 
 const iPhone = KnownDevices['iPhone 12'];
 
 interface ResultDataType {
-    type: 'info' | 'success' | 'error';
+    type: 'info' | 'ctrl' | 'success' | 'error';
     message: string;
     position: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user';
 }
@@ -33,7 +35,10 @@ export default class Test {
         this.apiUrl = this.site.apiUrl
     }
 
-    log(type: ResultDataType['type'], message: ResultDataType['message'], position: ResultDataType['position'] = 'common') {
+    log(type: ResultDataType['type'], 
+    message: ResultDataType['message'], 
+    position: ResultDataType['position'] = 'common') {
+        let updateTime = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
         this.socket.emit('result', { type, message, position })
     }
 
@@ -64,14 +69,14 @@ export default class Test {
 
             // await browser.close();
             this.log('info', `本次用时：${Math.floor((new Date().getTime() - now) / 1000)}秒`)
-            this.log('info', 'Status: success')
-            this.socket.close()
-            return
+            this.log('info', '测试结束')
+            this.log('ctrl', 'close')
         } catch (err) {
             console.log(`++++++++++++++++++++++`);
             console.log(err);
             this.log('error', 'Status: faild in start.')
-            this.socket.close()
+            this.log('info', '测试结束')
+            this.log('ctrl', 'close')
 
             if (!!browser.close) {
                 await browser.close()
@@ -92,6 +97,7 @@ export default class Test {
                 page.waitForNavigation(),
                 page.click('.main-category a.item'),
             ]);
+            sleep(3000);
             await this.checkCategory(page);
 
             // product
@@ -100,6 +106,7 @@ export default class Test {
                 page.waitForNavigation(),
                 page.click('.prod-list .prod-item:nth-of-type(10) a'),
             ]);
+            sleep(3000);
             await this.checkProduct(page);
 
             // cart
@@ -110,6 +117,7 @@ export default class Test {
                 page.waitForNavigation(),
                 page.click('#addCartModal .btn-checkout'),
             ]);
+            sleep(3000);
             await this.checkCart(page);
 
             // checkout
@@ -119,13 +127,13 @@ export default class Test {
                 page.waitForNavigation(),
                 page.click('.btn.proceed-btn'),
             ]);
+            sleep(3000);
             await this.checkCheckout(page);
 
         } catch (err) {
             this.log('error', 'Status: faild in queue.')
             return
         }
-
     }
 
     async checkIndex(page) {
@@ -138,7 +146,7 @@ export default class Test {
                     count = targetChild.length;
                     return count;
                 });
-                this.log('success', `主分类导航数量：${count}`, 'index')
+                this.log('success', `主分类导航数量：${count}个`, 'index')
             } else {
                 this.log('error', `主分类导航数量：获取异常`, 'index')
             }
@@ -150,7 +158,7 @@ export default class Test {
                     let targetChild = document.querySelectorAll('.r-item');
                     return targetChild.length;
                 })
-                this.log('success', `图片目录导航数量${count}`, 'index')
+                this.log('success', `图片目录导航数量：${count}个`, 'index')
             } else {
                 this.log('error', `图片目录导航数量：获取异常`, 'index')
             }
@@ -168,7 +176,7 @@ export default class Test {
                     let targetChild = document.querySelectorAll('.top-slide ul li');
                     return targetChild.length;
                 })
-                this.log('success', `首页slider数量${count}`, 'index')
+                this.log('success', `首页slider数量：${count}个`, 'index')
             } else {
                 this.log('error', `首页slider数量：获取异常`, 'index')
             }
@@ -189,7 +197,7 @@ export default class Test {
                     let targetChild = document.querySelectorAll('.top-multi-banner .swiper-slide');
                     return targetChild.length;
                 })
-                this.log('success', `顶部滚动banner数量${count}`, 'index')
+                this.log('success', `顶部滚动banner数量：${count}个`, 'index')
             } else {
                 this.log('error', `顶部滚动banner数量：获取异常`, 'index')
             }
@@ -215,7 +223,7 @@ export default class Test {
                     let targetChild = document.querySelectorAll('.prod-list .prod-item');
                     return targetChild.length;
                 })
-                this.log('success', `目录页产品数量${count}`, 'category')
+                this.log('success', `目录页产品数量：${count}个`, 'category')
             } else {
                 this.log('error', `目录页产品数量：获取异常`, 'category')
             }
@@ -244,17 +252,17 @@ export default class Test {
                         selectBoxes: selectBoxes.length
                     }
                 })
-                this.log('success', `规格选择项数量${count.selectBoxes}`, 'product')
+                this.log('success', `规格选择项数量：${count.selectBoxes}个`, 'product')
             } else {
                 this.log('error', `规格选择项数量：获取异常`, 'product')
             }
 
             // 加购
             await page.click('.select-color .color-list li:nth-child(2) a');
-            this.log('success', `加购--选择颜色：通过`, 'product')
+            this.log('success', `加购-->选择颜色：通过`, 'product')
 
             await page.click('.select-size ul li.item:nth-child(2)');
-            this.log('success', `加购--选择尺码：通过`, 'product')
+            this.log('success', `加购-->选择尺码：通过`, 'product')
 
             await page.click('.add-cart-box .btn-add-cart');
             let addToCartApiRE = /\/api\/product\/cart/ig;
@@ -262,7 +270,7 @@ export default class Test {
                 addToCartApiRE.test(response.url()) && response.status() === 200,
                 { timeout: 10000 }
             );
-            this.log('success', `加购--加入购物车：通过`, 'product')
+            this.log('success', `加购-->加入购物车：通过`, 'product')
         } catch (err) {
             this.log('error', `页面异常`, 'product')
         }
@@ -284,9 +292,9 @@ export default class Test {
                         "金额": total,
                     }
                 })
-                this.log('success', `购物车分组${count['购物车分组']}`, 'cart')
-                this.log('success', `产品${count['产品']}件`, 'cart')
-                this.log('success', `金额共计${count['金额']}`, 'cart')
+                this.log('success', `购物车分组：${count['购物车分组']}个`, 'cart')
+                this.log('success', `产品共：${count['产品']}件`, 'cart')
+                this.log('success', `金额共计：${count['金额']}`, 'cart')
             } else {
                 this.log('error', `未获取到数据`, 'cart')
             }

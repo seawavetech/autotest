@@ -1,7 +1,8 @@
 import axios from 'axios'
+import config from '../config'
 
 const http = axios.create({
-    baseURL: 'http://localhost:3333/api/v1',
+    baseURL: `${config.apiBaseUrl}/api/v1`,
     timeout: 60000,
     // withCredentials: true,
     headers: {

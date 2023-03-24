@@ -3,7 +3,7 @@
 import TestAll from './auto_test/test_all';
 
 export interface DispatchOption {
-    type: 'test' | string;
+    type: 'test' | 'other';
     site: 'dad' | 'ebd' | 'drw';
     platform: 'm' | 'pc';
     range: 'all' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user'

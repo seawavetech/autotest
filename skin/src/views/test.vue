@@ -1,21 +1,31 @@
 <template>
     <main>
-        <el-button type="primary" @click="startTest">开始测试</el-button>
-        <el-button type="primary" @click="wsInit">连接webSocket</el-button>
-        <el-button type="primary" @click="wsSend" v-if="wsConnected">webSocket测试</el-button>
+        <!-- <el-button type="primary" @click="startTest">开始测试</el-button> -->
+        <el-button type="primary" @click="wsInit">{{ wsConnected ? '已' : '' }}连接webSocket</el-button>
 
-        <div class="result" v-show="JSON.stringify(result) !== '{}'">
-            <pre>{{ JSON.stringify(result, null, 4) }} </pre>
-        </div>
+        <el-row class="my-3" v-if="wsConnected">
+            <el-button type="success" @click="startTest('dad', 'm')">DAD移动版下单流程</el-button>
+            <el-button type="success" @click="startTest('drw', 'm')">DRW移动版下单流程</el-button>
+        </el-row>
 
-        <div class="result-list" v-if="resultList.length">
-            <div class="item" v-for="(item, index) in resultList" :key="index">
-                <span>{{ item.type }}--</span>
-                <span>{{  item.position }}--</span>
-                <span>{{  item.message }}</span>
+        <el-row class="my-3">
+            <el-button type="info" plain @click="closeSocket" v-if="wsConnected">断开webSocket连接</el-button>
+            <el-button type="info" plain @click="resultListInit"  v-if="resultList.length > 1">清空测试结果</el-button>
+        </el-row>
+
+        <div class="result-list mt-3" v-if="resultList.length > 1">
+            <div class="item d-flex mb-2 py-1 px-2 border rounded-2" :class="item.type" v-for="(item, index) in resultList"
+                :key="index">
+                <div class="icon">
+                    <i class="bi bi-check-circle" v-if="item.type === 'success'"></i>
+                    <i class="bi bi-info-circle" v-else-if="item.type === 'info'"></i>
+                    <i class="bi bi-exclamation-triangle-fill" v-else-if="item.type === 'error'"></i>
+                </div>
+                <div class="type"> {{ item.type }} </div>
+                <div class="position">{{ item.position }}</div>
+                <div class="message">{{ item.message }}</div>
             </div>
         </div>
-
     </main>
 </template>
 
@@ -27,10 +37,12 @@ import { io, Socket } from 'socket.io-client';
 
 import type { Ref } from 'vue'
 interface ResultDataType {
-    type: 'info' | 'success' | 'error';
+    type: 'info' | 'ctrl' | 'success' | 'error' | '结果';
     message: string;
-    position: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user';
+    position: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user' | '页面';
 }
+
+let config:{[key in string]:string} = inject('$config')!;
 
 let route = useRoute();
 let result = ref({})
@@ -41,79 +53,142 @@ let range = route.query.range || 'all';
 
 let socket: Socket
 let wsConnected = ref(false);
-let resultList=<Ref<ResultDataType[]>>ref([])
+let resultList = <Ref<ResultDataType[]>>ref([])
 
 onMounted(() => {
     document.title = 'Auto Test For Trade.'
-
-    resultList.value.push({
-        type:'info',
-        message:'test',
-        position: 'common'
-    })
-    resultList.value.push({
-        type:'info',
-        message:'test',
-        position: 'common'
-    })
-    resultList.value.push({
-        type:'info',
-        message:'test',
-        position: 'common'
-    })
+    resultListInit();
 })
 
-function startTest() {
-    let url = `/test/${range}/${site}/${platform}`
-    testRequest(url).then((res) => {
-        result.value = res.data
-    })
+function resultListInit() {
+
+    resultList.value = [
+        {
+            type: '结果',
+            position: '页面',
+            message: '测试项'
+        }
+    ]
 }
 
+
 function wsInit() {
+    if (wsConnected.value) {
+        return;
+    }
     // ws连接由客户端发起，由服务器端发送完数据后关闭。
-    socket = io('ws://localhost:3333', {
+    socket = io(`${config.wsBaseUrl}`, {
         path: '/ws/',
         autoConnect: false
     });
 
+    resultListInit();
+
     socket.connect();
 
-    console.log(socket);
+    // console.log(socket);
     socket.on('connect', () => {
         wsConnected.value = true;
         console.log(socket.id);
     })
 
     socket.on("connect_error", () => {
+        wsConnected.value = false;
+        console.log('socket connect error');
         // socket.connect();
     });
 
     socket.on("disconnect", (reason) => {
         wsConnected.value = false;
-        console.log(reason)
+        console.log('socket disconnect:', reason)
     });
 
-    socket.on('result', (data:ResultDataType) => {
-        console.log(data);
-        resultList.value.push(data)
+    socket.on('result', (data: ResultDataType) => {
+        // console.log(data);
+        handlerResult(data);
     })
-
-
 }
 
-let count = 0;
-function wsSend() {
+function handlerResult(data: ResultDataType) {
+    switch (data.type) {
+        case 'ctrl':
+            handlerCtrlMessage(data);
+            break;
+        case 'success':
+        case 'error':
+        case 'info':
+            resultList.value.push(data)
+            break;
+        default:
+            break;
+    }
+}
+
+function handlerCtrlMessage(data: ResultDataType) {
+    switch (data.message) {
+        case 'close':
+            socket.close();
+            break;
+        default:
+            break;
+    }
+}
+
+function startTest(site = 'dad', platform = 'm') {
     socket.emit('message', {
         type: 'test',
-        site: 'dad',
-        platform: 'm',
+        site: site,
+        platform: platform,
         range: 'all'
     })
+
 }
 
-
-
+function closeSocket(){
+    socket.close();
+}
 
 </script>
+
+<style lang="less" scoped>
+.result-list {
+    background-color: #fff;
+
+    .item {
+        width: 600px;
+
+        .icon {
+            width: 60px;
+        }
+
+        .type {
+            width: 100px;
+            text-transform: capitalize;
+        }
+
+        .position {
+            width: 100px;
+        }
+
+        .message {
+            flex-grow: 1;
+        }
+
+        &.info {
+            background-color: #dcdcd0;
+            color: #333;
+        }
+
+        &.success {
+            background-color: #47a03d;
+            color: #fff;
+        }
+
+        &.error {
+            background-color: #be5050;
+            color: #e9e957;
+        }
+    }
+}
+</style>
 

@@ -13,11 +13,15 @@ function registerHandler(io, socket) {
         console.log(data)
     });
 
-    socket.emit('result', { a: 123, b: 456 })
+    // socket.emit('result', { a: 123, b: 456 })
 }
 
 function onConnection(io, socket) {
     registerHandler(io, socket);
+}
+
+function logCallback(data){
+
 }
 
 export default (io: Server) => {
