@@ -89,7 +89,7 @@ export default class Test extends TestBase {
                     response.url() == sliderApi && response.status() === 200,
                 { timeout: 10000 }
             );
-            let $slider = await page.$('.top-slide ul')
+            let $slider = await page.$('.top-slide ul li')
             if ($slider) {
                 let count = await page.evaluate(() => {
                     let targetChild = document.querySelectorAll('.top-slide ul li');

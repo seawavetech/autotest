@@ -23,6 +23,8 @@ export default abstract class Test {
     public apiUrl: string = '';
     public logCallback: TestClassOptions['logCallback'];
     public sleep = sleep;
+    public pageTimeout = 10000;
+    public apiTimeout = 5000;
 
     constructor(opts: TestClassOptions) {
         this.platform = opts.platform;
