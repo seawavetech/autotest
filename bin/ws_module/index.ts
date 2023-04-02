@@ -1,41 +1,34 @@
 // 分发 ws的信息。
 
-import TestAll from './auto_test/test_all';
+import TestMAll from './auto_test/test_all_m';
+import TestPcAll from './auto_test/test_all_pc';
 
-export interface DispatchOption {
-    type: 'test' | 'other';
-    site: 'dad' | 'ebd' | 'drw';
-    platform: 'm' | 'pc';
-    range: 'all' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user'
-}
+import { DispatchOption } from './type';
+
 
 export class Dispatch {
 
     opts: DispatchOption
 
-    constructor(opt: DispatchOption) {
-
+    constructor(options: DispatchOption) {
         this.opts = Object.assign({}, {
-            type: 'test',
             site: 'dad',
             platform: 'm',
             range: 'all'
-        }, opt)
+        }, options)
 
         this.handler()
     }
 
-
-    handler() {
-        let target;
-        switch (this.opts.type) {
-            case 'test':
-                target = new TestAll(this.opts)
-                target.start();
-                break;
-            default:
-                break;
+    public handler() {
+        let target: TestMAll;
+        if(this.opts.platform === 'm' && this.opts.range === 'all' ) {
+               target = new TestMAll(this.opts)
+        }else if(this.opts.platform === 'pc' && this.opts.range === 'all') {
+            target = new TestPcAll(this.opts)
         }
+
+        target.start();
 
     }
 }

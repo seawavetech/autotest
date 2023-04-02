@@ -1,133 +1,52 @@
-import puppeteer, { KnownDevices } from 'puppeteer';
-import { sleep } from '../../module/util'
-import path from 'path';
-import mkdirp from 'mkdirp';
-import moment from 'moment';
-import jquery from 'jquery';
+import TestBase from './base/test_base';
 
+import { TestClassOptions } from './base/type';
 
-import siteList from './site';
-
-const iPhone = KnownDevices['iPhone 12'];
-
-interface ResultDataType {
-    type: 'info' | 'ctrl' | 'success' | 'error';
-    message: string;
-    position: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user';
-}
-
-export default class Test {
-    io;
-    socket;
-    site: { [key in string]: any } = {};
-    platform: string = '';
-    url: string = '';
-    apiUrl: string = '';
-    result: { [key in string]: any } = {};
-
-
-    constructor(opts) {
-        this.io = opts.io;
-        this.socket = opts.socket;
-        this.platform = opts.platform;
-        this.site = opts.platform === 'm' ? siteList[opts.site].m : siteList[opts.site].pc;
-        this.url = this.site.domain;
-        this.apiUrl = this.site.apiUrl
+export default class Test extends TestBase {
+    constructor(opts: TestClassOptions) {
+        super(opts);
     }
 
-    log(type: ResultDataType['type'], 
-    message: ResultDataType['message'], 
-    position: ResultDataType['position'] = 'common') {
-        let updateTime = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-        this.socket.emit('result', { type, message, position })
-    }
-
-
-    async start() {
-        const month = moment().format("YYYY-MM");
-        const day = moment().format("DD");
-        const now = new Date().getTime();
-        const nowTime = moment().format("HHmmss");
-        let browser;
-
-        try {
-            browser = await puppeteer.launch({ headless: false })
-            this.log('info', `开始时间：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
-
-            const page = await browser.newPage();
-            await page.emulate(iPhone);
-            await page.setDefaultTimeout(60000);
-            switch (this.platform) {
-                case 'm':
-                    await this.queueM(page);
-                    break;
-                case 'pc':
-                    break;
-                default:
-                    break
-            }
-
-            // await browser.close();
-            this.log('info', `本次用时：${Math.floor((new Date().getTime() - now) / 1000)}秒`)
-            this.log('info', '测试结束')
-            this.log('ctrl', 'close')
-        } catch (err) {
-            console.log(`++++++++++++++++++++++`);
-            console.log(err);
-            this.log('error', 'Status: faild in start.')
-            this.log('info', '测试结束')
-            this.log('ctrl', 'close')
-
-            if (!!browser.close) {
-                await browser.close()
-            }
-            return err
-        }
-    }
-
-    async queueM(page) {
+    public async queue(page) {
         try {
             // index.
             await page.goto(this.url);
             await this.checkIndex(page);
 
             // category
+            await this.sleep(3000);
             await page.waitForSelector('.main-category a.item');
             await Promise.all([
                 page.waitForNavigation(),
                 page.click('.main-category a.item'),
             ]);
-            sleep(3000);
             await this.checkCategory(page);
 
             // product
+            await this.sleep(3000);
             await page.waitForSelector('.prod-list .prod-item:nth-of-type(10) a');
             await Promise.all([
                 page.waitForNavigation(),
                 page.click('.prod-list .prod-item:nth-of-type(10) a'),
             ]);
-            sleep(3000);
             await this.checkProduct(page);
 
             // cart
-            console.log('cart test.')
-            new Promise(_ => setTimeout(_, 3000)); // delay
+            await this.sleep(3000);
             await page.waitForSelector('#addCartModal a.btn-checkout');
             await Promise.all([
                 page.waitForNavigation(),
                 page.click('#addCartModal .btn-checkout'),
             ]);
-            sleep(3000);
             await this.checkCart(page);
 
             // checkout
-            await new Promise(_ => setTimeout(_, 3000)); // delay
+            await this.sleep(3000);
             await page.waitForSelector('.btn.proceed-btn');
             await Promise.all([
                 page.waitForNavigation(),
                 page.click('.btn.proceed-btn'),
             ]);
-            sleep(3000);
             await this.checkCheckout(page);
 
         } catch (err) {
@@ -136,7 +55,7 @@ export default class Test {
         }
     }
 
-    async checkIndex(page) {
+    public async checkIndex(page) {
         try {
             //检查分类列表1
             let $category1 = await page.$('.main-category');
@@ -186,9 +105,8 @@ export default class Test {
             if (!$banner) {
                 let bannerApi = `${this.apiUrl}/activity/banners`;
                 console.log(bannerApi);
-                const bannerResponse = await page.waitForResponse(
-                    response =>
-                        response.url() == bannerApi && response.status() === 200,
+                const bannerResponse = await page.waitForResponse(response =>
+                    response.url() == bannerApi && response.status() === 200,
                     { timeout: 15000 }
                 );
             }
@@ -208,13 +126,12 @@ export default class Test {
         }
     }
 
-    async checkCategory(page) {
+    public async checkCategory(page) {
         try {
-            // 检查product
+            // 检查category
             let productApi = `/product/batch/info`
-            await page.waitForResponse(
-                response =>
-                    !!response.url().match(productApi) && response.status() === 200,
+            await page.waitForResponse(response =>
+                !!response.url().match(productApi) && response.status() === 200,
                 { timeout: 10000 }
             );
             let $products = await page.$('.prod-list .prod-item')
@@ -230,12 +147,11 @@ export default class Test {
 
         } catch (err) {
             this.log('error', `获取异常`, 'category')
-
         }
         return
     }
 
-    async checkProduct(page) {
+    public async checkProduct(page) {
         //todo: 需要分别测试各种类型的产品。
         try {
             // 检查product
@@ -276,8 +192,7 @@ export default class Test {
         }
     }
 
-    async checkCart(page) {
-        let cartResult: { [key in string]: any } = {}
+    public async checkCart(page) {
         try {
             // 检查购物车
             let $cartForm = await page.$('.cart-list')
@@ -304,8 +219,7 @@ export default class Test {
 
     }
 
-    async checkCheckout(page) {
-        let checkoutResult: { [key in string]: any } = {}
+    public async checkCheckout(page) {
         try {
             // 填写地址
             await page.waitForSelector('form.input-address');
@@ -314,19 +228,19 @@ export default class Test {
             await page.type('input#address', '123 Compute Rd.', { delay: 100 });
             await page.type('input#city', 'NetOnline', { delay: 100 });
             await page.select('select#country-id', '1')
-            await new Promise(_ => { setTimeout(_, 3000) });
+            await this.sleep(3000);
             await page.select('select#province-id', '9');
             await page.type('input#postal', '318097', { delay: 100 });
             await page.type('input#phone', '9153643212', { delay: 100 });
             await page.type('input#email', 'bottest@163.com', { delay: 100 });
 
-                this.log('success', `地址填写：通过`, 'checkout')
+            this.log('success', `地址填写：通过`, 'checkout')
 
             await page.click('.js-address-save')
             await page.waitForSelector('.js-shipping-list li:first-child input', { visible: true })
             this.log('success', `地址保存：通过`, 'checkout')
 
-            await new Promise(_ => { setTimeout(_, 3000) })
+            await this.sleep(3000);
             await page.click('.js-shipping-list li:first-child input')
             let shippingApiRE = /checkout\/ajaxGetShippingFee/ig;
             await page.waitForResponse(res =>
@@ -335,7 +249,7 @@ export default class Test {
             )
             this.log('success', `运输方式保存：通过`, 'checkout')
 
-            await new Promise(_ => { setTimeout(_, 3000) })
+            await this.sleep(3000);
             await page.click('.js-rush-list li:first-child input')
             let rushApiRE = /checkout\/ajaxGetRushFee/ig;
             await page.waitForResponse(res =>

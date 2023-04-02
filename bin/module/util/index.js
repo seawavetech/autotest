@@ -1,4 +1,4 @@
-exports.throttle = function (fn, delay, mustRunDelay = 0) {
+export function throttle (fn, delay, mustRunDelay = 0) {
     let timer = null;
     let tStart;
     return function () {
@@ -20,11 +20,11 @@ exports.throttle = function (fn, delay, mustRunDelay = 0) {
     };
 };
 
-exports.sleep = function (time) {
+export function sleep(time) {
     return new Promise(resolve => setTimeout(() => resolve(1), time))
 };
 
-exports.type = function (data) {
+export function type (data) {
     if (!data) return false
     let result = Object.prototype.toString.call(data)
     return result.match(/\[object\s(.+)\]/)[1].toLowerCase()
