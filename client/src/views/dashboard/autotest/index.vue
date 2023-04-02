@@ -1,5 +1,5 @@
 <template>
-    <main>
+    <main class="p-3">
         <!-- <Button type="primary" @click="startTest">开始测试</Button> -->
         <Button type="primary" @click="wsInit">{{ wsConnected ? '已' : '' }}连接webSocket</Button>
 
@@ -17,12 +17,12 @@
         </Row>
 
         <div class="result-list mt-3" v-if="resultList.length > 1">
-            <div class="item d-flex mb-2 py-1 px-2 border rounded-2" :class="item.type" v-for="(item, index) in resultList"
+            <div class="item flex mb-2 py-1 px-2 border rounded" :class="item.type" v-for="(item, index) in resultList"
                 :key="index">
                 <div class="icon">
-                    <i class="bi bi-check-circle" v-if="item.type === 'success'"></i>
-                    <i class="bi bi-info-circle" v-else-if="item.type === 'info'"></i>
-                    <i class="bi bi-exclamation-triangle-fill" v-else-if="item.type === 'error'"></i>
+                    <CheckCircleOutlined  v-if="item.type === 'success'" />
+                    <InfoCircleOutlined v-else-if="item.type === 'info'" />
+                    <CloseCircleOutlined v-else-if="item.type === 'error'" />
                 </div>
                 <div class="type"> {{ item.type }} </div>
                 <div class="position">{{ item.position }}</div>
@@ -35,6 +35,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Row,Button } from 'ant-design-vue';
+import { CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
+
 // import { useRoute } from 'vue-router';
 import { useGlobSetting } from '/@/hooks/setting';
 
