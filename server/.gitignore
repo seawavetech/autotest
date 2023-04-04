@@ -115,3 +115,5 @@ dist
 build
 .strapi-updater.json
 data
+
+src/extensions/documentation
