@@ -61,7 +61,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     build: {
       target: 'es2015',
-      outDir: OUTPUT_DIR,
+      outDir: env.VITE_OUT_DIR,
       terserOptions: {
         compress: {
           keep_infinity: true,
