@@ -19,6 +19,9 @@ dependencies:
   better-sqlite3:
     specifier: ^8.2.0
     version: 8.2.0
+  helmet:
+    specifier: ^6.0.1
+    version: 6.0.1
   moment:
     specifier: ^2.29.4
     version: 2.29.4
@@ -6302,6 +6305,11 @@ packages:
   /helmet@4.6.0:
     resolution: {integrity: sha512-HVqALKZlR95ROkrnesdhbbZJFi/rIVSoNq6f3jA/9u6MIbTsPh3xZwihjeI5+DO/2sOV6HMHooXcEOuwskHpTg==}
     engines: {node: '>=10.0.0'}
+    dev: false
+
+  /helmet@6.0.1:
+    resolution: {integrity: sha512-8wo+VdQhTMVBMCITYZaGTbE4lvlthelPYSvoyNvk4RECTmrVjMerp9RfUOQXZWLvCcAn1pKj7ZRxK4lI9Alrcw==}
+    engines: {node: '>=14.0.0'}
     dev: false
 
   /highlight.js@10.7.3:
