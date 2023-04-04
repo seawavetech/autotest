@@ -1,5 +1,3 @@
-import {helMetConfig} from './middlewares/helmet'
-
 export default [
   'strapi::errors',
   'strapi::security',
@@ -11,8 +9,4 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
-  {
-    name:'helmet',
-    config: helMetConfig
-  },
 ];

@@ -1,11 +1,15 @@
-import { contentSecurityPolicy } from "helmet";
+import helmet from "helmet";
 
 
 export let helMetConfig={
     enabled: true,
-    contentSecurityPolicy:{
-        directives: {
-            connectSrc:['self',"https"]
+    options:{
+        contentSecurityPolicy:{
+            directives: {
+                connectSrc:['self',"https"]
+            }
         }
-    }
+    },
+    fn: helmet(),
+    loadOrder:100
 }
