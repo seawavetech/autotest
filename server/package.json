@@ -1,8 +1,8 @@
 {
-  "name": "strapi-t-1",
+  "name": "Auto Test",
   "private": true,
-  "version": "0.1.0",
-  "description": "A Strapi application",
+  "version": "1.0.0",
+  "description": "Auto Test Server",
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
@@ -25,9 +25,7 @@
   "author": {
     "name": "A Strapi developer"
   },
-  "strapi": {
-    "uuid": "274adbac-80a1-4a6d-8f77-948752ca84ec"
-  },
+  "strapi": {},
   "engines": {
     "node": ">=14.19.1 <=18.x.x",
     "npm": ">=6.0.0"

@@ -8,7 +8,7 @@ export default ({ env })=>({
         config:{
             IOServerOptions:{
                 cors:{},
-                path:'/ws/'
+                path:'/strapi/ws/'
             },
             contentTypes:{
                 'message':'*',

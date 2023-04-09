@@ -85,7 +85,7 @@ function wsInit() {
     }
     // ws连接由客户端手动发起，由服务器端发送完数据后，发出关闭指令，客户端自动关闭连接。
     socket = io(`${globSetting.wsUrl}`, {
-        path: '/ws/',
+        path: globSetting.wsPrefix,
         autoConnect: false
     });
 
