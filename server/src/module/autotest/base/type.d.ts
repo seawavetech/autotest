@@ -8,6 +8,7 @@ export interface ResultDataType {
 export interface TestClassOptions {
     site:'dad'|'drw'|'ebd';
     platform: 'm' | 'pc';
+    env:any;
     logCallback(data:ResultDataType):()=>undefined | undefined;
 }
 

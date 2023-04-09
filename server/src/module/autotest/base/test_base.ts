@@ -25,11 +25,14 @@ export default abstract class Test {
     public pageTimeout = 10000;
     public apiTimeout = 5000;
 
+    private headless = true;
+
     constructor(opts: TestClassOptions) {
         this.platform = opts.platform;
         this.site = opts.platform === 'm' ? siteList[opts.site].m : siteList[opts.site].pc;
         this.url = this.site.domain;
         this.apiUrl = this.site.apiUrl;
+        this.headless = opts.env.bool('PUPPETEER_HEADLESS',true);
         this.logCallback = opts.logCallback;
     }
 
@@ -41,7 +44,7 @@ export default abstract class Test {
         let browser;
 
         try {
-            browser = await puppeteer.launch({ headless: false })
+            browser = await puppeteer.launch({ headless: this.headless })
             this.log('info', `开始时间：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
 
             const page = await browser.newPage();

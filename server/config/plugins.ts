@@ -22,7 +22,7 @@ export default ({ env })=>({
                         socket.on('message', (data: DispatchOption) => {
                             console.log('message:');
                             console.log(data);
-                            new Dispatch(Object.assign({}, data, { logCallback }));
+                            new Dispatch(Object.assign({}, data, { env,logCallback }));
                         })
                     
                         socket.on('disconnect', (data) => {
