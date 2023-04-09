@@ -34,6 +34,7 @@ export default abstract class Test {
         this.apiUrl = this.site.apiUrl;
         this.headless = opts.env.bool('PUPPETEER_HEADLESS',true);
         this.logCallback = opts.logCallback;
+        console.log(opts.env);
     }
 
     public async start() {
@@ -43,8 +44,10 @@ export default abstract class Test {
         const nowTime = moment().format("HHmmss");
         let browser;
 
+        console.log(this.headless);
+
         try {
-            browser = await puppeteer.launch({ headless: this.headless })
+            browser = await puppeteer.launch()
             this.log('info', `开始时间：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
 
             const page = await browser.newPage();
