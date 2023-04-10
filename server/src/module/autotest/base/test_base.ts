@@ -46,7 +46,9 @@ export default abstract class Test {
         const nowTime = moment().format("HHmmss");
 
         let browser;
-        const options = {};
+        const options = {
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        };
 
         if (this.headless === false) {
             options['headless'] = false;
@@ -54,7 +56,6 @@ export default abstract class Test {
         if (this.browserPath) {
             options['executablePath'] = this.browserPath;
         }
-        options['args'] = ['--no-sandbox', '--disable-setuid-sandbox']
 
         // console.log(this.headless);
 
