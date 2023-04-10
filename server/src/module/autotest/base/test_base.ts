@@ -26,6 +26,7 @@ export default abstract class Test {
     public apiTimeout = 5000;
 
     private headless = true;
+    private browserPath = ''
 
     constructor(opts: TestClassOptions) {
         this.platform = opts.platform;
@@ -33,6 +34,7 @@ export default abstract class Test {
         this.url = this.site.domain;
         this.apiUrl = this.site.apiUrl;
         this.headless = opts.env.bool('PUPPETEER_HEADLESS',true);
+        this.browserPath = opts.env('CHROMIUM_PATH','');
         this.logCallback = opts.logCallback;
         console.log(opts.env);
     }
@@ -42,12 +44,21 @@ export default abstract class Test {
         const day = moment().format("DD");
         const now = new Date().getTime();
         const nowTime = moment().format("HHmmss");
+        
         let browser;
+        const options = {};
+        if(!this.headless) {
+            options['headless'] = false;
+        }
+
+        if(this.browserPath){
+            options['executablePath'] = this.browserPath;
+        }
 
         console.log(this.headless);
 
         try {
-            browser = await puppeteer.launch()
+            browser = await puppeteer.launch(options)
             this.log('info', `开始时间：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
 
             const page = await browser.newPage();
@@ -69,7 +80,7 @@ export default abstract class Test {
             this.log('info', '出现错误，测试中断');
             this.log('ctrl', 'close');
 
-            if (!!browser.close) {
+            if (!!browser['close']) {
                 await browser.close();
             }
             // return err
