@@ -8,11 +8,11 @@ import { ResultDataType, TestClassOptions } from './type';
 
 const iPhone = KnownDevices['iPhone 12'];
 const PC = {
-    viewport :{
+    viewport: {
         width: 1400,
         height: 960,
     },
-    userAgent :'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
 }
 
 export default abstract class Test {
@@ -33,8 +33,8 @@ export default abstract class Test {
         this.site = opts.platform === 'm' ? siteList[opts.site].m : siteList[opts.site].pc;
         this.url = this.site.domain;
         this.apiUrl = this.site.apiUrl;
-        this.headless = opts.env.bool('PUPPETEER_HEADLESS',true);
-        this.browserPath = opts.env('CHROMIUM_PATH','');
+        this.headless = opts.env.bool('PUPPETEER_HEADLESS', true);
+        this.browserPath = opts.env('CHROMIUM_PATH', '');
         this.logCallback = opts.logCallback;
         console.log(opts.env);
     }
@@ -44,25 +44,26 @@ export default abstract class Test {
         const day = moment().format("DD");
         const now = new Date().getTime();
         const nowTime = moment().format("HHmmss");
-        
+
         let browser;
         const options = {};
-        if(!this.headless) {
+
+        if (this.headless === false) {
             options['headless'] = false;
         }
-
-        if(this.browserPath){
+        if (this.browserPath) {
             options['executablePath'] = this.browserPath;
         }
+        options['args'] = ['--no-sandbox', '--disable-setuid-sandbox']
 
-        console.log(this.headless);
+        // console.log(this.headless);
 
         try {
             browser = await puppeteer.launch(options)
             this.log('info', `开始时间：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
 
             const page = await browser.newPage();
-            await page.emulate(this.platform === 'm'? iPhone : PC);
+            await page.emulate(this.platform === 'm' ? iPhone : PC);
             await page.setDefaultTimeout(60000);
             await this.queue(page);
 
@@ -70,7 +71,7 @@ export default abstract class Test {
             this.log('info', `本次用时：${Math.floor((new Date().getTime() - now) / 1000)}秒`);
             this.log('info', '测试结束');
             this.log('ctrl', 'close');
-            
+
             await this.sleep(10000);
             await browser.close();
         } catch (err) {
