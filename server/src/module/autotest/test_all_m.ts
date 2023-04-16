@@ -10,6 +10,7 @@ export default class Test extends TestBase {
     public async queue(page) {
         try {
             // index.
+            console.log(this.url)
             await page.goto(this.url);
             await this.checkIndex(page);
 
