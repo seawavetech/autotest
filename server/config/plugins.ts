@@ -20,9 +20,9 @@ export default ({ env })=>({
                         strapi.log.info(`[io] new connection with id ${socket.id}`);
                         // console.log(strapi.$io)
                         socket.on('message', (data: DispatchOption) => {
-                            console.log('message:');
-                            console.log(data);
-                            new Dispatch(Object.assign({}, data, { env,logCallback }));
+                            // console.log('message:');
+                            // console.log(data);
+                            new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
                         })
                     
                         socket.on('disconnect', (data) => {

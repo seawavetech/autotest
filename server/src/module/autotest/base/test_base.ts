@@ -61,22 +61,21 @@ export default abstract class Test {
 
         try {
             browser = await puppeteer.launch(options)
-            this.log('info', `开始时间：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
+            this.log('info', `测试开始：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
 
             const page = await browser.newPage();
             await page.emulate(this.platform === 'm' ? iPhone : PC);
             await page.setDefaultTimeout(60000);
             await this.queue(page);
 
-            this.log('info', `结束时间：${moment().format('YYYY-MM-DD HH:mm:ss')}`);
+            this.log('info', `测试结束：${moment().format('YYYY-MM-DD HH:mm:ss')}`);
             this.log('info', `本次用时：${Math.floor((new Date().getTime() - now) / 1000)}秒`);
-            this.log('info', '测试结束');
             this.log('ctrl', 'close');
 
             await this.sleep(10000);
             await browser.close();
         } catch (err) {
-            console.log(`++++++++++++++++++++++`);
+            console.info(`++++++++++++++++++++++`);
             console.log(err);
             this.log('error', 'Status: faild in start.');
             this.log('info', '出现错误，测试中断');

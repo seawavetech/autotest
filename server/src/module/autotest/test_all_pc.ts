@@ -10,48 +10,51 @@ export default class Test extends TestBase {
     public async queue(page) {
         try {
             // index.
-            await page.goto(this.url);
+            await page.goto(this.url,{waitUntil:'domcontentloaded'});
             await this.checkIndex(page);
 
-            return;
-
             // category
-            await page.waitForSelector('.main-category a.item');
             await Promise.all([
-                page.waitForNavigation(),
-                page.click('.main-category a.item'),
+                page.waitForNavigation({waitUntil:'domcontentloaded'}),
+                page.click('#app .header_inner > nav > div > a:nth-child(2)'),
             ]);
-            this.sleep(3000);
+            await this.sleep(3000);
             await this.checkCategory(page);
 
             // product
-            await page.waitForSelector('.prod-list .prod-item:nth-of-type(10) a');
+            let target = '#app .p-list-main .p-list .p-item:nth-child(4) a';
+            await page.evaluate(selector=>{
+                let el:HTMLElement=document.querySelector(selector);
+                el.removeAttribute('target');
+            },target)
             await Promise.all([
-                page.waitForNavigation(),
-                page.click('.prod-list .prod-item:nth-of-type(10) a'),
-            ]);
-            this.sleep(3000);
+                page.waitForNavigation({waitUntil:'domcontentloaded'}),
+                page.click(target),
+            ]).catch((err)=>{
+                console.log(err)
+            });
+            // console.log('after click.')
+            await this.sleep(3000);
+            // console.log('after sleep.')
             await this.checkProduct(page);
 
             // cart
-            console.log('cart test.')
-            new Promise(_ => setTimeout(_, 3000)); // delay
-            await page.waitForSelector('#addCartModal a.btn-checkout');
+            // console.log('cart test.')
+            
+            await page.waitForSelector('.header_inner .s-bag a.btn-checkout');
             await Promise.all([
-                page.waitForNavigation(),
-                page.click('#addCartModal .btn-checkout'),
+                page.waitForNavigation({waitUntil:'domcontentloaded'}),
+                page.click('.header_inner .s-bag  a.btn-checkout'),
             ]);
-            this.sleep(3000);
             await this.checkCart(page);
 
             // checkout
-            await new Promise(_ => setTimeout(_, 3000)); // delay
-            await page.waitForSelector('.btn.proceed-btn');
+            await this.sleep(2000);
+            await page.waitForSelector('.right-box .btn-checkout');
             await Promise.all([
-                page.waitForNavigation(),
-                page.click('.btn.proceed-btn'),
+                page.waitForNavigation({waitUntil:'domcontentloaded'}),
+                page.click('.right-box .btn-checkout'),
             ]);
-            this.sleep(3000);
             await this.checkCheckout(page);
 
         } catch (err) {
@@ -64,7 +67,8 @@ export default class Test extends TestBase {
         try {
 
             //检查导航数量
-            let $nav = await page.$('nav.nav');
+            let $nav = await page.waitForSelector('nav.nav');
+            // console.log($nav);
             if ($nav) {
                 let count = await page.evaluate(() => {
                     let targetChild = document.querySelectorAll('nav.nav .level-1 .item');
@@ -77,8 +81,8 @@ export default class Test extends TestBase {
             }
 
             // best sellers
-            this.sleep(2000);
-            let $category2 = await page.$('.section.s-4')
+            await this.sleep(2000);
+            let $category2 = await page.waitForSelector('.section.s-4')
             if ($category2) {
                 let count = await page.evaluate(() => {
                     let targetChild = document.querySelectorAll('.section.s-4 .swiper-wrapper .item');
@@ -90,8 +94,8 @@ export default class Test extends TestBase {
             }
 
             // new arrivals.
-            this.sleep(2000);
-            let $category3 = await page.$('.new.section.s-5')
+            await this.sleep(2000);
+            let $category3 = await page.waitForSelector('.new.section.s-5')
             if ($category3) {
                 let count = await page.evaluate(() => {
                     let tag = document.querySelectorAll('.new.section.s-5 .tag-box .tag');
@@ -112,8 +116,8 @@ export default class Test extends TestBase {
 
             
             // 检查slider
-            this.sleep(3000);
-            let $slider = await page.$('.index_slide .swiper-wrapper')
+            await this.sleep(3000);
+            let $slider = await page.waitForSelector('.index_slide .swiper-wrapper')
             if (!$slider) {
                 let sliderApi = `${this.apiUrl}/activity/sliders`
                 const sliderResponse = await page.waitForResponse(response =>
@@ -133,11 +137,11 @@ export default class Test extends TestBase {
             }
 
             // 检查banner
-            let $banner = await page.$('header .top_banner')
+            let $banner = await page.waitForSelector('header .top_banner')
             if (!$banner) {
                 let bannerApi = `${this.apiUrl}/activity/banners`;
-                console.log(bannerApi);
-                const bannerResponse = await page.waitForResponse(response =>
+                // console.log(bannerApi);
+                await page.waitForResponse(response =>
                     response.url() == bannerApi && response.status() === 200,
                     { timeout: 15000 }
                 );
@@ -153,8 +157,7 @@ export default class Test extends TestBase {
             }
 
         } catch (err) {
-            this.log('error', `获取异常`, 'index')
-
+            this.log('error', `首页获取异常`, 'index')
             console.log(err);
         }
     }
@@ -162,16 +165,11 @@ export default class Test extends TestBase {
     public async checkCategory(page) {
         try {
             // 检查product
-            let productApi = `/product/batch/info`
-            await page.waitForResponse(
-                response =>
-                    !!response.url().match(productApi) && response.status() === 200,
-                { timeout: 10000 }
-            );
-            let $products = await page.$('.prod-list .prod-item')
+            // console.log('category test inner...')
+            let $products = await page.waitForSelector('.p-list-main .p-list .p-item')
             if ($products) {
                 let count = await page.evaluate(() => {
-                    let targetChild = document.querySelectorAll('.prod-list .prod-item');
+                    let targetChild = document.querySelectorAll('.p-list-main .p-list .p-item');
                     return targetChild.length;
                 })
                 this.log('success', `目录页产品数量：${count}个`, 'category')
@@ -189,35 +187,47 @@ export default class Test extends TestBase {
         //todo: 需要分别测试各种类型的产品。
         try {
             // 检查product
-            let productApiRE = /api\/product\/info\/\d+/ig;
-            await page.waitForResponse(response =>
-                productApiRE.test(response.url()) && response.status() === 200,
-                { timeout: 10000 }
-            );
-            let $selectBox = await page.$('.select-box')
-            if ($selectBox) {
-                let count = await page.evaluate(() => {
-                    let selectBoxes = document.querySelectorAll('.select-box');
+            // let productApiRE = /api\/product\/info\/\d+/i;
+            // await page.waitForResponse(response =>
+            //     productApiRE.test(response.url()) && response.status() === 200,
+            //     { timeout: 10000 }
+            // );
+            // console.log('check product inner..')
+            let pageData = await page.waitForSelector('.p-intro .color-list .item')
+            if (pageData) {
+                let data = await page.evaluate(() => {
+                    let titleEL = document.querySelector('.p-intro .p-name');
+                    let snEL = document.querySelector('.p-intro .p-sn .code');
+                    let colorItems = document.querySelectorAll('.p-intro .color-list .item');
+                    let sizeItems = document.querySelectorAll('.p-intro .size-list .item');
+                    let imgItems = document.querySelectorAll('.p-detail .img-box .img-list-slide .item.swiper-slide')
                     return {
-                        selectBoxes: selectBoxes.length
+                        title:titleEL.innerHTML,
+                        sn:snEL.innerHTML,
+                        colorCount: colorItems.length,
+                        sizeCount: sizeItems.length,
+                        imgCount: imgItems.length,
                     }
                 })
-                this.log('success', `规格选择项数量：${count.selectBoxes}个`, 'product')
+                this.log('success', `产品标题：${data.title}`, 'product')
+                this.log('success', `产品SN ：${data.sn}`, 'product')
+                this.log('success', `颜色数量：${data.colorCount}个`, 'product')
+                this.log('success', `尺码数量：${data.sizeCount}个`, 'product')
+                this.log('success', `产品图数量：${data.imgCount}个`, 'product')
             } else {
-                this.log('error', `规格选择项数量：获取异常`, 'product')
+                this.log('error', `获取页面数据：常`, 'product')
             }
 
             // 加购
-            await page.click('.select-color .color-list li:nth-child(2) a');
+            await page.click('.p-intro .color-list .item:nth-child(2)');
             this.log('success', `加购-->选择颜色：通过`, 'product')
 
-            await page.click('.select-size ul li.item:nth-child(2)');
+            await page.click('.p-intro .size-list .item:nth-child(2)');
             this.log('success', `加购-->选择尺码：通过`, 'product')
 
-            await page.click('.add-cart-box .btn-add-cart');
-            let addToCartApiRE = /\/api\/product\/cart/ig;
+            await page.click('.btn-add-to-bag');
             await page.waitForResponse(response =>
-                addToCartApiRE.test(response.url()) && response.status() === 200,
+                /\/api\/product\/cart/i.test(response.url()) && response.status() === 200,
                 { timeout: 10000 }
             );
             this.log('success', `加购-->加入购物车：通过`, 'product')
@@ -229,12 +239,13 @@ export default class Test extends TestBase {
     public async checkCart(page) {
         try {
             // 检查购物车
-            let $cartForm = await page.$('.cart-list')
+            // console.log('check cart inner..')
+            let $cartForm = await page.waitForSelector('.cart-group-list')
             if ($cartForm) {
                 let count = await page.evaluate(() => {
                     let groupList = document.querySelectorAll('.cart-group-list');
-                    let item = document.querySelectorAll('.cart-item');
-                    let total = document.querySelector('.total-price span:nth-child(2)').textContent
+                    let item = document.querySelectorAll('.cart-group-list .c-item');
+                    let total = document.querySelector('.right-box .summary .total .val').textContent
                     return {
                         "购物车分组": groupList.length,
                         "产品": item.length,
@@ -256,49 +267,83 @@ export default class Test extends TestBase {
     public async checkCheckout(page) {
         try {
             // 填写地址
-            await page.waitForSelector('form.input-address');
-            await page.type('input#first-name', 'Bot', { delay: 100 });
-            await page.type('input#last-name', 'Test', { delay: 100 });
-            await page.type('input#address', '123 Compute Rd.', { delay: 100 });
-            await page.type('input#city', 'NetOnline', { delay: 100 });
-            await page.select('select#country-id', '1')
-            await new Promise(_ => { setTimeout(_, 3000) });
-            await page.select('select#province-id', '9');
-            await page.type('input#postal', '318097', { delay: 100 });
-            await page.type('input#phone', '9153643212', { delay: 100 });
-            await page.type('input#email', 'bottest@163.com', { delay: 100 });
+            await page.waitForSelector('.s-address .edit-address');
+            await page.evaluate(()=>{
+                let formItem = document.querySelectorAll('.edit-address .form-item');
+                formItem.forEach((item,index)=>{
+                    item.classList.add('formItem'+index);
+                })
+            })
+
+            await page.type('.formItem0 input', 'Bot', { delay: 100 });
+            await page.type('.formItem1 input', 'Test', { delay: 100 });
+            await page.type('.formItem2 input', '123 Compute Rd.', { delay: 100 });
+
+            await page.type('.formItem4 input', '318097', { delay: 100 });
+            await page.type('.formItem6 input', 'NetOnline', { delay: 100 });
+            await page.type('.formItem7 input', '9153643212', { delay: 100 });
+            await page.type('.formItem8 input', 'bottest@163.com', { delay: 100 });
+
+            await page.click('.formItem3 .v-select .vs__selected')
+            await this.sleep(2000)
+            await page.click('.formItem3 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
+
+            await this.sleep(3000)
+            await page.click('.formItem5 .v-select .vs__selected')
+            await this.sleep(2000)
+            await page.click('.formItem5 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
+  
 
             this.log('success', `地址填写：通过`, 'checkout')
 
-            await page.click('.js-address-save')
-            await page.waitForSelector('.js-shipping-list li:first-child input', { visible: true })
+            await page.click('.btn-save-address')
+            await page.waitForSelector('.address-list input[name="address_item"]', { visible: true })
             this.log('success', `地址保存：通过`, 'checkout')
 
-            await new Promise(_ => { setTimeout(_, 3000) })
-            await page.click('.js-shipping-list li:first-child input')
-            let shippingApiRE = /checkout\/ajaxGetShippingFee/ig;
-            await page.waitForResponse(res =>
-                shippingApiRE.test(res.url()) && res.status() === 200,
-                { timeout: 10000 }
-            )
+            await this.sleep(3000);
+            await page.click('.s-shipping #shippingems')
+            let shippingApiRE = /checkout\/ajaxGetShippingFee/i;
+            await page.waitForResponse(res =>{
+                return shippingApiRE.test(res.url()) && res.status() === 200
+            },{ timeout: 10000 })
             this.log('success', `运输方式保存：通过`, 'checkout')
 
-            await new Promise(_ => { setTimeout(_, 3000) })
-            await page.click('.js-rush-list li:first-child input')
-            let rushApiRE = /checkout\/ajaxGetRushFee/ig;
+            await this.sleep(3000);
+            await page.click('.s-shipping .date-list .item:nth-child(1) input')
+            await page.click('.s-shipping .date-list .item:nth-child(2) input')
+            let rushApiRE = /checkout\/ajaxGetRushFee/i;
             await page.waitForResponse(res =>
                 rushApiRE.test(res.url()) && res.status() === 200,
                 { timeout: 10000 }
             )
             this.log('success', `加急选择：通过`, 'checkout')
 
-            await page.click('.js-shipping-continue');
+            let data=await page.evaluate(()=>{
+                let summary = document.querySelectorAll('.right-box .sum-list .item')
+                let data=[];
+                summary.forEach(i=>{
+                    data.push({
+                        key:i.querySelector('.key').textContent,
+                        val:i.querySelector('.val').textContent
+                    })
+
+                })
+
+                return data
+            })
+
+            for(let i=0;i<data.length;i++){
+                let obj=data[i];
+                this.log('success',`${obj.key}  ${obj.val}`,'checkout')
+                await this.sleep(1000);
+            }
+            
 
             // 提交订单
 
 
         } catch (err) {
-            this.log('error', `页面异常`, 'cart')
+            this.log('error', `页面异常`, 'checkout')
         }
     }
 }

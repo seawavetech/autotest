@@ -1,32 +1,41 @@
 <template>
-    <main class="p-3">
-        <!-- <Button type="primary" @click="startTest">开始测试</Button> -->
-        <Button type="primary" @click="wsInit">{{ wsConnected ? '已' : '' }}连接webSocket</Button>
+    <main class="p-3 h-full relative bg-white">
+        <div class="m-header sticky top-20 bg-white">
+            <Row class="my-3">
+                <Button class="mr-3" type="default" @click="startTest(['drw', 'm'])">DRW移动版下单流程</Button>
+                <Button class="mr-3" type="default" @click="startTest(['drw', 'pc'])">DRW桌面版下单流程</Button>
 
-        <Row class="my-3" v-if="wsConnected">
-            <Button type="default" @click="startTest('dad', 'm')">DAD移动版下单流程</Button>
-            <Button type="default" @click="startTest('dad', 'pc')">DAD桌面版下单流程</Button>
-            
-            <Button type="default" @click="startTest('drw', 'm')">DRW移动版下单流程</Button>
-            <Button type="default" @click="startTest('drw', 'pc')">DRW桌面版下单流程</Button>
-        </Row>
+                <Button class="mr-3" type="default" @click="startTest(['dad', 'm'])">DAD移动版下单流程</Button>
+                <Button class="mr-3" type="default" @click="startTest(['dad', 'pc'])">DAD桌面版下单流程</Button>
+            </Row>
 
-        <Row class="my-3">
-            <Button type="default" plain @click="closeSocket" v-if="wsConnected">断开webSocket连接</Button>
-            <Button type="default" plain @click="resultListInit"  v-if="resultList.length > 1">清空测试结果</Button>
-        </Row>
+            <div class=" p-2 bg-blue-100 text-md" v-if="isLoading">
+                正在测试<span class="inline-block mx-1 px-2 bg-green-400 text-white">{{ curSite.site }}</span>站
+                <span class="inline-block mx-1 px-2 bg-red-400 text-white">{{ curSite.platform }}</span>端
+            </div>
+
+            <Row class="my-3" v-if="!isLoading">
+                <!-- <Button class="mr-3" type="default" plain @click="closeSocket" v-if="wsConnected">断开webSocket连接</Button> -->
+                <Button class="mr-3 bg-blue-200" type="default" plain @click="resultListInit"
+                    v-if="resultList.length > 1">清空测试结果</Button>
+            </Row>
+        </div>
 
         <div class="result-list mt-3" v-if="resultList.length > 1">
+            <div class=" p-2 bg-blue-100 text-md" v-if="!isLoading">
+                测试结果：<span class="inline-block mx-1 px-2 bg-green-400 text-white">{{ curSite.site }}</span>站
+                <span class="inline-block mx-1 px-2 bg-red-400 text-white">{{ curSite.platform }}</span>端
+            </div>
             <div class="item flex mb-2 py-1 px-2 border rounded" :class="item.type" v-for="(item, index) in resultList"
                 :key="index">
-                <div class="icon">
-                    <CheckCircleOutlined  v-if="item.type === 'success'" />
+                <div class="icon w-1/12">
+                    <CheckCircleOutlined v-if="item.type === 'success'" />
                     <InfoCircleOutlined v-else-if="item.type === 'info'" />
                     <CloseCircleOutlined v-else-if="item.type === 'error'" />
                 </div>
-                <div class="type"> {{ item.type }} </div>
-                <div class="position">{{ item.position }}</div>
-                <div class="message">{{ item.message }}</div>
+                <div class="type w-3/12"> {{ item.type }} </div>
+                <div class="position w-3/12">{{ item.position }}</div>
+                <div class="message w-5/12 flex-grow-0">{{ item.message }}</div>
             </div>
         </div>
     </main>
@@ -34,7 +43,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { Row,Button } from 'ant-design-vue';
+import { Row, Button } from 'ant-design-vue';
 import { CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
 
 // import { useRoute } from 'vue-router';
@@ -46,20 +55,20 @@ import type { Ref } from 'vue'
 interface ResultDataType {
     type: 'info' | 'ctrl' | 'success' | 'error' | '结果';
     message: string;
-    position: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user' | '页面';
+    position: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user' | '模块';
 }
 
-// let route = useRoute();
-// let result = ref({})
-
-// let site = route.query.site || 'dad';
-// let platform = route.query.platform || 'm';
-// let range = route.query.range || 'all';
+interface siteType {
+    site: 'dad' | 'drw';
+    platform: 'pc' | 'm';
+}
 
 const globSetting = useGlobSetting();
 
 let socket: Socket
 let wsConnected = ref(false);
+let isLoading = ref(false);
+let curSite = <Ref<siteType>>ref({});
 let resultList = <Ref<ResultDataType[]>>ref([])
 
 onMounted(() => {
@@ -72,7 +81,7 @@ function resultListInit() {
     resultList.value = [
         {
             type: '结果',
-            position: '页面',
+            position: '模块',
             message: '测试项'
         }
     ]
@@ -89,23 +98,31 @@ function wsInit() {
         autoConnect: false
     });
 
-    resultListInit();
-
     socket.connect();
 
     // console.log(socket);
     socket.on('connect', () => {
+        isLoading.value = true;
         wsConnected.value = true;
-        console.log('connect,id:',socket.id);
+        console.log('connect,id:', socket.id);
+
+        socket.emit('message', {
+            type: 'test',
+            site: curSite.value.site,
+            platform: curSite.value.platform,
+            range: 'all'
+        })
     })
 
     socket.on("connect_error", () => {
+        isLoading.value = false;
         wsConnected.value = false;
         console.log('socket connect error');
         // socket.connect();
     });
 
     socket.on("disconnect", (reason) => {
+        isLoading.value = false;
         wsConnected.value = false;
         console.log('socket disconnect:', reason)
     });
@@ -141,17 +158,22 @@ function handlerCtrlMessage(data: ResultDataType) {
     }
 }
 
-function startTest(site = 'dad', platform = 'm') {
-    socket.emit('message', {
-        type: 'test',
-        site: site,
-        platform: platform,
-        range: 'all'
-    })
+function startTest(siteInfo) {
+
+    if (isLoading.value) return;
+
+    let [site, platform] = siteInfo
+    curSite.value = {
+        site,
+        platform,
+    }
+
+    resultListInit();
+    wsInit();
 
 }
 
-function closeSocket(){
+function closeSocket() {
     socket.close();
 }
 
