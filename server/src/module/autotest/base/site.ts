@@ -11,12 +11,12 @@ export default {
     },
     'drw': {
         m: {
-            domain: 'https://m.dorriswedding.com',
-            apiUrl: 'https://mapi.dorriswedding.com/api',
+            domain: 'http://m.dorriswedding.com',
+            apiUrl: 'http://mapi.dorriswedding.com/api',
         },
         pc: {
-            domain: 'https://www.dorriswedding.com',
-            apiUrl: 'https://api.dorriswedding.com/api',
+            domain: 'http://www.dorriswedding.com',
+            apiUrl: 'http://api.dorriswedding.com/api',
         }
     }
 }
