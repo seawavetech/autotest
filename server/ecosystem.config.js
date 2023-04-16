@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name:'ATServer',
-    script: 'npm',
+    script: 'yarn',
     args:'start',
     //watch: './'
   }],
