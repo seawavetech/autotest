@@ -67,8 +67,10 @@ function init(env:any,data:siteData){
 
 export default (env:any)=>{
 
+    console.log('return cron tasks.')
+
     return {
-        dad_m: {
+        'dad_m': {
             task: ({strapi})=>{
 
                 let data: siteData= {
@@ -86,7 +88,7 @@ export default (env:any)=>{
                 rule:'0 0 15 * * *',
             }
         },
-        dad_pc: {
+        'dad_pc': {
             task: ({strapi})=>{
 
                 let data: siteData= {
@@ -104,7 +106,7 @@ export default (env:any)=>{
                 rule:'10 0 15 * * *',
             }
         },
-        drw_m: {
+        'drw_m': {
             task: ({strapi})=>{
 
                 let data: siteData= {
@@ -122,7 +124,7 @@ export default (env:any)=>{
                 rule:'20 0 15 * * *',
             }
         },
-        drw_pc: {
+        'drw_pc': {
             task: ({strapi})=>{
 
                 let data: siteData= {
