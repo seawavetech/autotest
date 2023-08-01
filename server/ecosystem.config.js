@@ -3,6 +3,6 @@ module.exports = {
     name:'ATServer',
     script: 'yarn',
     args:'start',
-    //watch: './'
+    watch: './dist'
   }],
 };

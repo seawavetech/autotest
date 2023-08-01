@@ -9,7 +9,7 @@ export interface TestClassOptions {
     site:'dad'|'drw'|'ebd';
     platform: 'm' | 'pc';
     env:any;
-    logCallback(data:ResultDataType):()=>undefined | undefined;
+    logCallback(data:ResultDataType):void ;
 }
 
 export interface DispatchOption extends TestClassOptions {

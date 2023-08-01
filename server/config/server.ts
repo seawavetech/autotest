@@ -12,7 +12,7 @@ export default ({ env }) => ({
   },
   cron:{
     enabled: true,
-    tasks: cronTasks,
+    tasks: cronTasks(env),
   },
   dirs:{
     // public:'./'
