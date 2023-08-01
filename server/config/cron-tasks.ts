@@ -86,6 +86,7 @@ export default (env:any)=>{
             },
             options: {
                 rule:'0 0 15 * * *',
+                tz:'Asia/Shanghai'
             }
         },
         'dad_pc': {
@@ -104,6 +105,7 @@ export default (env:any)=>{
             },
             options: {
                 rule:'10 0 15 * * *',
+                tz:'Asia/Shanghai'
             }
         },
         'drw_m': {
@@ -122,6 +124,7 @@ export default (env:any)=>{
             },
             options: {
                 rule:'20 0 15 * * *',
+                tz:'Asia/Shanghai'
             }
         },
         'drw_pc': {
@@ -140,6 +143,7 @@ export default (env:any)=>{
             },
             options: {
                 rule:'30 0 15 * * *',
+                tz:'Asia/Shanghai'
             }
         },
     }
