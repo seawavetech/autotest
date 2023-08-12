@@ -70,6 +70,7 @@ export default (env:any)=>{
     console.log('return cron tasks.')
 
     return {
+        
         'dad_m': {
             task: ({strapi})=>{
 
@@ -104,7 +105,7 @@ export default (env:any)=>{
                 new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
             },
             options: {
-                rule:'10 0 15 * * *',
+                rule:'0 10 15 * * *',
                 tz:'Asia/Shanghai'
             }
         },
@@ -123,7 +124,7 @@ export default (env:any)=>{
                 new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
             },
             options: {
-                rule:'20 0 15 * * *',
+                rule:'0 20 15 * * *',
                 tz:'Asia/Shanghai'
             }
         },
@@ -142,9 +143,10 @@ export default (env:any)=>{
                 new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
             },
             options: {
-                rule:'30 0 15 * * *',
+                rule:'0 30 15 * * *',
                 tz:'Asia/Shanghai'
             }
         },
+        
     }
 }
