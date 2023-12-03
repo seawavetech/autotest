@@ -194,19 +194,23 @@ export default class Test extends TestBase {
             // );
             // console.log('check product inner..')
             let pageData = await page.waitForSelector('.p-intro .color-list .item')
+            let data:any;
             if (pageData) {
-                let data = await page.evaluate(() => {
+                data = await page.evaluate(() => {
                     let titleEL = document.querySelector('.p-intro .p-name');
                     let snEL = document.querySelector('.p-intro .p-sn .code');
                     let colorItems = document.querySelectorAll('.p-intro .color-list .item');
                     let sizeItems = document.querySelectorAll('.p-intro .size-list .item');
                     let imgItems = document.querySelectorAll('.p-detail .img-box .img-list-slide .item.swiper-slide')
+                    let multiSelectTab = document.querySelectorAll('.multi-select-tab');
+                    let isInstock = multiSelectTab.length > 0
                     return {
                         title:titleEL.innerHTML,
                         sn:snEL.innerHTML,
                         colorCount: colorItems.length,
                         sizeCount: sizeItems.length,
                         imgCount: imgItems.length,
+                        isInstock: isInstock,
                     }
                 })
                 this.log('success', `产品标题：${data.title}`, 'product')
@@ -219,11 +223,13 @@ export default class Test extends TestBase {
             }
 
             // 加购
-            await page.click('.p-intro .color-list .item:nth-child(2)');
-            this.log('success', `加购-->选择颜色：通过`, 'product')
+            if (!data.isInstock) {
+                await page.click('.p-intro .color-list .item:nth-child(2)');
+                this.log('success', `加购-->选择颜色：通过`, 'product')
 
-            await page.click('.p-intro .size-list .item:nth-child(2)');
-            this.log('success', `加购-->选择尺码：通过`, 'product')
+                await page.click('.p-intro .size-list .item:nth-child(2)');
+                this.log('success', `加购-->选择尺码：通过`, 'product')
+            }
 
             await page.click('.btn-add-to-bag');
             await page.waitForResponse(response =>

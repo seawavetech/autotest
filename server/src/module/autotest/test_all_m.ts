@@ -23,7 +23,7 @@ export default class Test extends TestBase {
             await this.checkCategory(page);
 
             // product
-            let targetProdSelector = '.prod-list .prod-item:nth-of-type(10) a'
+            let targetProdSelector = '.prod-list .prod-item:nth-of-type(6) a'
             await page.waitForSelector(targetProdSelector);
             await Promise.all([
                 page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
@@ -148,7 +148,7 @@ export default class Test extends TestBase {
                 this.log('success', `目录title：${data.title}`, 'category')
                 this.log('success', `目录页产品数量：${data.itemCount}个`, 'category')
                 this.log('success', `目录首个产品标题：${data.firstTitle}`, 'category')
-                this.log('success', `目录首个产品价格：${data.firstPrice}个`, 'category')
+                // this.log('success', `目录首个产品价格：${data.firstPrice}`, 'category')
             } else {
                 this.log('error', `目录页产品数量：获取异常`, 'category')
             }
@@ -167,22 +167,31 @@ export default class Test extends TestBase {
             }, { timeout: 10000 }).catch();
             await this.sleep(3000);
             let $selectBox = await page.waitForSelector('.select-box');
+            let data:any;
             if ($selectBox) {
                 // console.log('selectbox  check inner...')
 
-                let data = await page.evaluate(() => {
+                data = await page.evaluate(() => {
+                    /* todo 
+                    是否是库存商品
+                    分别处理两种商品的加购过程
+                    */
                     let titleEl = document.querySelector('.prod-title span:nth-child(2)');
                     let colorList = document.querySelectorAll('.select-color ul.color-list > li a');
                     let sizeList = document.querySelectorAll('.select-size .size-list-wrap ul > li:not(.empty-li)');
                     let selectBoxes = document.querySelectorAll('.select-box');
+                    let multiSelectTab = document.querySelectorAll('.multi-select-tab-box');
+                    let isInstock = multiSelectTab.length > 0
                     return {
                         title: titleEl.textContent.trim(),
                         selectBoxes: selectBoxes.length,
                         colorCount: colorList.length,
                         sizeCount: sizeList.length,
+                        isInstock: isInstock,
                     }
                 })
                 this.log('success', `产品标题：${data.title}`, 'product')
+                this.log('success', `是否库存商品？${data.isInstock ? 'Yes': 'No'}`, 'product')
                 this.log('success', `规格选择项数量：${data.selectBoxes}个`, 'product')
                 this.log('success', `可选颜色数量：${data.colorCount}个`, 'product')
                 this.log('success', `可选尺码数量：${data.sizeCount}个`, 'product')
@@ -191,12 +200,14 @@ export default class Test extends TestBase {
             }
 
             // 加购
-            await page.click('.select-color .color-list li:nth-child(2) a');
-            this.log('success', `加购-->选择颜色：通过`, 'product')
+            if (!data.isInstock) {
+                await page.click('.select-color .color-list li:nth-child(2) a');
+                this.log('success', `加购-->选择颜色：通过`, 'product')
 
-            await page.click('.select-size ul li.item:nth-child(2)');
-            this.log('success', `加购-->选择尺码：通过`, 'product')
-
+                await page.click('.select-size ul li.item:nth-child(2)');
+                this.log('success', `加购-->选择尺码：通过`, 'product')
+            }
+            
             await page.click('.add-cart-box .btn-add-cart');
             await page.waitForResponse(res =>
                 /\/api\/product\/cart/i.test(res.url()) && res.status() === 200,
