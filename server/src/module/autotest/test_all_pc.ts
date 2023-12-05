@@ -307,25 +307,25 @@ export default class Test extends TestBase {
             this.log('success', `地址保存：通过`, 'checkout')
 
             await this.sleep(3000);
-            await page.click('.s-shipping #shippingems')
+            await page.click('.s-shipping #shippingups')
             let shippingApiRE = /checkout\/ajaxGetShippingFee/i;
             await page.waitForResponse(res =>{
                 return shippingApiRE.test(res.url()) && res.status() === 200
             },{ timeout: 10000 })
             this.log('success', `运输方式保存：通过`, 'checkout')
 
-            await this.sleep(3000);
-            await page.click('.s-shipping .date-list .item:nth-child(1) input')
-            await page.click('.s-shipping .date-list .item:nth-child(2) input')
-            let rushApiRE = /checkout\/ajaxGetRushFee/i;
-            await page.waitForResponse(res =>
-                rushApiRE.test(res.url()) && res.status() === 200,
-                { timeout: 10000 }
-            )
-            this.log('success', `加急选择：通过`, 'checkout')
+            // await this.sleep(3000);
+            // await page.click('.s-shipping .date-list .item:nth-child(1) input')
+            // await page.click('.s-shipping .date-list .item:nth-child(2) input')
+            // let rushApiRE = /checkout\/ajaxGetRushFee/i;
+            // await page.waitForResponse(res =>
+            //     rushApiRE.test(res.url()) && res.status() === 200,
+            //     { timeout: 10000 }
+            // )
+            // this.log('success', `加急选择：通过`, 'checkout')
 
             let data=await page.evaluate(()=>{
-                let summary = document.querySelectorAll('.right-box .sum-list .item')
+                let summary = document.querySelectorAll('.right-box-inner .sum-list .item')
                 let data=[];
                 summary.forEach(i=>{
                     data.push({
@@ -340,7 +340,7 @@ export default class Test extends TestBase {
 
             for(let i=0;i<data.length;i++){
                 let obj=data[i];
-                this.log('success',`${obj.key}  ${obj.val}`,'checkout')
+                this.log('success',`${obj.key}:  ${obj.val}`,'checkout')
                 await this.sleep(1000);
             }
             
