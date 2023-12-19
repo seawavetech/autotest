@@ -59,7 +59,7 @@ export default abstract class Test {
         // console.log(this.headless);
 
         try {
-            browser = await puppeteer.launch(options)
+            browser = await puppeteer.launch(options).catch(err=>console.log(err));
             this.log('info', `测试开始：${moment().format('YYYY-MM-DD HH:mm:ss')}`)
 
             const page = await browser.newPage();
