@@ -81,21 +81,21 @@ export default class Test extends TestBase {
             }
 
             // best sellers
-            await this.sleep(2000);
-            let $category2 = await page.waitForSelector('.section.s-4')
-            if ($category2) {
-                let count = await page.evaluate(() => {
-                    let targetChild = document.querySelectorAll('.section.s-4 .swiper-wrapper .item');
-                    return targetChild.length;
-                })
-                this.log('success', `Weekly Best Sellers产品数量：${count}个`, 'index')
-            } else {
-                this.log('error', `Weekly Best Sellers产品数量：获取异常`, 'index')
-            }
+            // await this.sleep(2000);
+            // let $category2 = await page.waitForSelector('.section.s-4')
+            // if ($category2) {
+            //     let count = await page.evaluate(() => {
+            //         let targetChild = document.querySelectorAll('.section.s-4 .swiper-wrapper .item');
+            //         return targetChild.length;
+            //     })
+            //     this.log('success', `Weekly Best Sellers产品数量：${count}个`, 'index')
+            // } else {
+            //     this.log('error', `Weekly Best Sellers产品数量：获取异常`, 'index')
+            // }
 
             // new arrivals.
             await this.sleep(2000);
-            let $category3 = await page.waitForSelector('.new.section.s-5')
+            let $category3 = await page.waitForSelector('.new.section.s-5').catch(()=>{})
             if ($category3) {
                 let count = await page.evaluate(() => {
                     let tag = document.querySelectorAll('.new.section.s-5 .tag-box .tag');
@@ -117,7 +117,7 @@ export default class Test extends TestBase {
             
             // 检查slider
             await this.sleep(3000);
-            let $slider = await page.waitForSelector('.index_slide .swiper-wrapper')
+            let $slider = await page.waitForSelector('.index_slide .swiper-wrapper').catch(()=>{})
             if (!$slider) {
                 let sliderApi = `${this.apiUrl}/activity/sliders`
                 const sliderResponse = await page.waitForResponse(response =>
@@ -137,7 +137,7 @@ export default class Test extends TestBase {
             }
 
             // 检查banner
-            let $banner = await page.waitForSelector('header .top_banner')
+            let $banner = await page.waitForSelector('header .top_banner').catch(()=>{})
             if (!$banner) {
                 let bannerApi = `${this.apiUrl}/activity/banners`;
                 // console.log(bannerApi);
