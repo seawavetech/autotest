@@ -2,11 +2,14 @@
     <main class="p-3 h-full relative bg-white">
         <div class="m-header sticky top-20 bg-white">
             <Row class="my-3">
-                <Button class="mr-3" type="default" @click="startTest(['drw', 'm'])">DRW移动版下单流程</Button>
-                <Button class="mr-3" type="default" @click="startTest(['drw', 'pc'])">DRW桌面版下单流程</Button>
+                <Button class="mr-3" type="default" @click="startTest(['drw', 'm'])">DRW移动</Button>
+                <Button class="mr-3" type="default" @click="startTest(['drw', 'pc'])">DRW桌面</Button>
 
-                <Button class="mr-3" type="default" @click="startTest(['dad', 'm'])">DAD移动版下单流程</Button>
-                <Button class="mr-3" type="default" @click="startTest(['dad', 'pc'])">DAD桌面版下单流程</Button>
+                <Button class="mr-3" type="default" @click="startTest(['dad', 'm'])">DAD移动</Button>
+                <Button class="mr-3" type="default" @click="startTest(['dad', 'pc'])">DAD桌面</Button>
+
+                <Button class="mr-3" type="default" @click="startTest(['ebd', 'm'])">EBD移动</Button>
+                <Button class="mr-3" type="default" @click="startTest(['ebd', 'pc'])">EBD桌面</Button>
             </Row>
 
             <div class=" p-2 flex bg-blue-100 text-md" v-if="isLoading">
@@ -66,7 +69,7 @@ interface ResultDataType {
 }
 
 interface siteType {
-    site: 'dad' | 'drw';
+    site: 'dad' | 'drw' | 'ebd' | 'drb';
     platform: 'pc' | 'm';
 }
 
@@ -93,7 +96,6 @@ function resultListInit() {
         }
     ]
 }
-
 
 function wsInit() {
     if (wsConnected.value) {

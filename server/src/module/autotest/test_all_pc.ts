@@ -281,23 +281,23 @@ export default class Test extends TestBase {
                 })
             })
 
-            await page.type('.formItem0 input', 'Bot', { delay: 100 });
-            await page.type('.formItem1 input', 'Test', { delay: 100 });
-            await page.type('.formItem2 input', '123 Compute Rd.', { delay: 100 });
+            await page.type('.formItem1 input', 'Bot', { delay: 100 });
+            await page.type('.formItem2 input', 'Test', { delay: 100 });
+            await page.type('.formItem3 input', '123 Compute Rd.', { delay: 100 });
 
-            await page.type('.formItem4 input', '318097', { delay: 100 });
-            await page.type('.formItem6 input', 'NetOnline', { delay: 100 });
-            await page.type('.formItem7 input', '9153643212', { delay: 100 });
-            await page.type('.formItem8 input', 'bottest@163.com', { delay: 100 });
+            await page.type('.formItem5 input', 'NetOnline', { delay: 100 });
+            await page.type('.formItem6 input', '318097', { delay: 100 });
+            await page.type('.formItem7 input', 'bottest@163.com', { delay: 100 });
+            await page.type('.formItem8 input', '9153643212', { delay: 100 });
 
-            await page.click('.formItem3 .v-select .vs__selected')
+            await page.click('.formItem0 .v-select .vs__selected')
             await this.sleep(2000)
-            await page.click('.formItem3 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
+            await page.click('.formItem0 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
 
             await this.sleep(3000)
-            await page.click('.formItem5 .v-select .vs__selected')
+            await page.click('.formItem4 .v-select .vs__selected')
             await this.sleep(2000)
-            await page.click('.formItem5 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
+            await page.click('.formItem4 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
   
 
             this.log('success', `地址填写：通过`, 'checkout')
@@ -314,15 +314,23 @@ export default class Test extends TestBase {
             },{ timeout: 10000 })
             this.log('success', `运输方式保存：通过`, 'checkout')
 
-            // await this.sleep(3000);
-            // await page.click('.s-shipping .date-list .item:nth-child(1) input')
-            // await page.click('.s-shipping .date-list .item:nth-child(2) input')
-            // let rushApiRE = /checkout\/ajaxGetRushFee/i;
-            // await page.waitForResponse(res =>
-            //     rushApiRE.test(res.url()) && res.status() === 200,
-            //     { timeout: 10000 }
-            // )
-            // this.log('success', `加急选择：通过`, 'checkout')
+            await this.sleep(3000);
+            let rushLength = await page.evaluate(()=>{
+                let items = document.querySelectorAll('.s-shipping .date-list .item');
+                return items.length;
+            })
+            if(rushLength > 1) {
+                await page.click('.s-shipping .date-list .item:nth-child(1) input')
+                await page.click('.s-shipping .date-list .item:nth-child(2) input')
+                let rushApiRE = /checkout\/ajaxGetRushFee/i;
+                await page.waitForResponse(res =>
+                    rushApiRE.test(res.url()) && res.status() === 200,
+                    { timeout: 10000 }
+                )
+                this.log('success', `加急选择：通过`, 'checkout')
+            }else {
+                this.log('success', `加急选择项数量：${rushLength}`, 'checkout')
+            }
 
             let data=await page.evaluate(()=>{
                 let summary = document.querySelectorAll('.right-box-inner .sum-list .item')

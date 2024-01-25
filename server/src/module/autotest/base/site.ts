@@ -18,5 +18,15 @@ export default {
             domain: 'http://www.dorriswedding.com',
             apiUrl: 'http://api.dorriswedding.com/api',
         }
+    },
+    'ebd': {
+        m: {
+            domain: 'http://www.ellenbridals.com',
+            apiUrl: 'http://mapi.ellenbridals.com/api',
+        },
+        pc: {
+            domain: 'http://www.ellenbridals.com',
+            apiUrl: 'http://api.ellenbridals.com/api',
+        }
     }
 }

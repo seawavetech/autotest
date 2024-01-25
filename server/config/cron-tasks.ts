@@ -64,89 +64,86 @@ function init(env:any,data:siteData){
     noticeTitle = `自动化测试:${data.site}-${data.platform}`
 }
 
+let sites:{
+    title: string;
+    info: siteData;
+    cron_rull: string;
+}[] = [ {
+        title: 'dad_m',
+        info:{
+            site: 'dad',
+            platform: 'm',
+            type: 'test',
+            range: 'all',
+        },
+        cron_rull:'0 0 15 * * *'
+    }, {
+        title: 'dad_pc',
+        info: {
+            site: 'dad',
+            platform: 'pc',
+            type: 'test',
+            range: 'all',
+        },
+        cron_rull:'0 10 15 * * *'
+    }, {
+        title: 'drw_m',
+        info: {
+            site: 'drw',
+            platform: 'm',
+            type: 'test',
+            range: 'all',
+        },
+        cron_rull:'0 20 15 * * *'
+    }, {
+        title: 'drw_pc',
+        info : {
+            site: 'drw',
+            platform: 'pc',
+            type: 'test',
+            range: 'all',
+        },
+        cron_rull:'0 30 15 * * *'
+    }, {
+        title: 'ebd_m',
+        info: {
+            site: 'ebd',
+            platform: 'm',
+            type: 'test',
+            range: 'all',
+        },
+        cron_rull:'0 20 15 * * *'
+    }, {
+        title: 'ebd_pc',
+        info : {
+            site: 'ebd',
+            platform: 'pc',
+            type: 'test',
+            range: 'all',
+        },
+        cron_rull:'0 30 15 * * *'
+    } ]
+
 
 export default (env:any)=>{
 
+    let task_cron = {};
+    sites.forEach(i=>{
+        task_cron[i.title] = {
+            task: ({strapi})=>{
+                let data: siteData= i.info;
+                init(env,data)
+
+                strapi.log.info(`autotest start:${data.site}-${data.platform}`)
+                new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
+            },
+            options: {
+                rule:i.cron_rull,
+                tz:'Asia/Shanghai'
+            }
+        }
+    })
+
     console.log('return cron tasks.')
-
-    return {
-        
-        'dad_m': {
-            task: ({strapi})=>{
-
-                let data: siteData= {
-                    site: 'dad',
-                    platform: 'm',
-                    type: 'test',
-                    range: 'all'
-                }
-                init(env,data)
-
-                strapi.log.info(`autotest start:${data.site}-${data.platform}`)
-                new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
-            },
-            options: {
-                rule:'0 0 15 * * *',
-                tz:'Asia/Shanghai'
-            }
-        },
-        'dad_pc': {
-            task: ({strapi})=>{
-
-                let data: siteData= {
-                    site: 'dad',
-                    platform: 'pc',
-                    type: 'test',
-                    range: 'all'
-                }
-                init(env,data)
-
-                strapi.log.info(`autotest start:${data.site}-${data.platform}`)
-                new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
-            },
-            options: {
-                rule:'0 10 15 * * *',
-                tz:'Asia/Shanghai'
-            }
-        },
-        'drw_m': {
-            task: ({strapi})=>{
-
-                let data: siteData= {
-                    site: 'drw',
-                    platform: 'm',
-                    type: 'test',
-                    range: 'all'
-                }
-                init(env,data)
-
-                strapi.log.info(`autotest start:${data.site}-${data.platform}`)
-                new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
-            },
-            options: {
-                rule:'0 20 15 * * *',
-                tz:'Asia/Shanghai'
-            }
-        },
-        'drw_pc': {
-            task: ({strapi})=>{
-
-                let data: siteData= {
-                    site: 'drw',
-                    platform: 'pc',
-                    type: 'test',
-                    range: 'all'
-                }
-                init(env,data)
-
-                strapi.log.info(`autotest start:${data.site}-${data.platform}`)
-                new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
-            },
-            options: {
-                rule:'0 30 15 * * *',
-                tz:'Asia/Shanghai'
-            }
-        },
-        
-    }
+    return  task_cron;
 }
