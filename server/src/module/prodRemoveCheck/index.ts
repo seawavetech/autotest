@@ -77,7 +77,6 @@ export class Crawler extends Base {
 
             if(body.code === 200 && resProds) {
                 if(resProds.length > 0) {
-                    // console.log(this.curSns[1])
                     let prods = this.curSns.filter(i=>{
                         return !resProds.some(j=>j.pid == i[1]*1)
                     })
@@ -90,9 +89,11 @@ export class Crawler extends Base {
                     }
 
                 }
+                console.log('接口返回的产品数量为0')
+
                 return true;
             }else {
-                // console.log('请求产品更新接口失败')
+                console.log('请求产品更新接口失败')
                 return false
             }
         } catch (err) {
