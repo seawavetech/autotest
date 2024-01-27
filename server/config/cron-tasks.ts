@@ -44,13 +44,13 @@ let prodCheckLogCallback = (data:ProdCheckResultData):void=>{
     switch (data.type) {
         case 'success':
             let textArr = [
-                {
+                [{
                     tag: "text",
                     text: data.info
-                }, {
+                }], [{
                     tag: "text",
                     text: data.message
-                },
+                }],
             ];
 
             notice(textArr)
@@ -188,12 +188,16 @@ export default (env:any)=>{
         productRemoveCheck:{
             task: ({strapi})=>{
                 init(env,`下架产品检测`)
-
+                prodCheckLogCallback({
+                    type: 'success',
+                    message: '开始检查下架商品',
+                    info:'none'
+                })
                 strapi.log.info(`Product Check Start`)
                 new Crawler({env,logCallback:prodCheckLogCallback}).start();
             },
             options: {
-                rule:'0 56 21 * * *',
+                rule:'0 09 22 * * *',
                 tz:'Asia/Shanghai'
             }
         }

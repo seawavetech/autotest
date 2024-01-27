@@ -80,11 +80,10 @@ export default abstract class Base {
     public log(type: ResultDataType['type'],
         message: ResultDataType['message'],
         info: ResultDataType['info'] = 'common') {
-        let updateTime = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+        // let updateTime = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
 
         if (this.logCallback) {
             this.logCallback({ type, message, info })
-            // console.log(type,message,position)
         }
     }
 }
