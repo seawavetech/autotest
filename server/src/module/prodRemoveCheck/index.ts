@@ -1,6 +1,6 @@
 import Base from './base';
-import { fakePage } from './data/helperData.json';
-import sns from './data/sn.json';
+import { fakePage } from './helperData.json';
+import sns from './sn.json';
 import * as fs from 'fs-extra';
 
 import { DispatchOption } from '../@type/prodRemoveCheck';
