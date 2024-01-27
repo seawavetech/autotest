@@ -2,7 +2,7 @@
 export interface ResultDataType {
     type: 'info' | 'ctrl' | 'success' | 'error';
     message: string;
-    position: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user';
+    position?: 'common' | 'index' | 'category' | 'product' | 'cart' | 'checkout' | 'user';
 }
 
 export interface TestClassOptions {

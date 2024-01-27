@@ -79,11 +79,11 @@ export default abstract class Base {
     /* 执行状态与处理解耦，仅返回执行结果，由各调用方二次处理。*/
     public log(type: ResultDataType['type'],
         message: ResultDataType['message'],
-        position: ResultDataType['position'] = 'common') {
+        info: ResultDataType['info'] = 'common') {
         let updateTime = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
 
         if (this.logCallback) {
-            this.logCallback({ type, message, position })
+            this.logCallback({ type, message, info })
             // console.log(type,message,position)
         }
     }

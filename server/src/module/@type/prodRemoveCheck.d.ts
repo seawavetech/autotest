@@ -2,7 +2,7 @@
 export interface ResultDataType {
     type: 'info' | 'ctrl' | 'success' | 'error';
     message: string;
-    position: string;
+    info?: string;
 }
 
 export interface TestClassOptions {

@@ -3,6 +3,7 @@ import { Dispatch} from '../src/module/autotest';
 import { Crawler } from '../src/module/prodRemoveCheck';
 // import { Dispatch} from '../src/module/autotest';
 import { DispatchOption,ResultDataType} from '../src/module//@type/autotest'
+import { ResultDataType as ProdCheckResultData} from '../src/module//@type/prodRemoveCheck'
 import axios from 'axios';
 
 interface siteData {
@@ -14,13 +15,23 @@ interface siteData {
 
 let url = ''
 let noticeTitle = ''
-let msgArr:ResultDataType[] = []
+let msgArr:ResultDataType[] | ProdCheckResultData[] = []
 let logCallback = (data:ResultDataType):void=>{
 
     switch (data.type) {
         case 'ctrl':
             if (data.message === 'close') {
-                notice()
+                let textArr = msgArr.map(i=>{
+                    let str = `状态:${i.type} | 位置：${i.position}`;
+                    if(i.message) {
+                        str += ` | 信息：${i.message}`
+                    }
+                    return [{
+                        tag:"text",
+                        text:str
+                    }]
+                })
+                notice(textArr)
             }
             break;
         default:
@@ -29,19 +40,44 @@ let logCallback = (data:ResultDataType):void=>{
 
 };
 
+let prodCheckLogCallback = (data:ProdCheckResultData):void=>{
+    switch (data.type) {
+        case 'success':
+            let textArr = [
+                {
+                    tag: "text",
+                    text: data.info
+                }, {
+                    tag: "text",
+                    text: data.message
+                },
+            ];
 
-function notice(){
+            notice(textArr)
+            break;
+        case 'ctrl':
+            if (data.message === 'close') {
+                let textArr = msgArr.map(i => {
+                    let str = `状态:${i.type} | ${i.info}`;
+                    if (i.message) {
+                        str += ` | 信息：${i.message}`
+                    }
+                    return [{
+                        tag: "text",
+                        text: str
+                    }]
+                })
+                notice(textArr)
+            }
+            break;
+        default:
+            msgArr.push(data)
+    }
+    
+};
 
-    let textArr = msgArr.map(i=>{
-        let str = `状态:${i.type} | 位置：${i.position}`;
-        if(i.message) {
-            str += ` | 信息：${i.message}`
-        }
-        return [{
-            tag:"text",
-            text:str
-        }]
-    })
+
+function notice(textArr){
 
     axios.post(url, {
         "msg_type": "post",
@@ -154,10 +190,10 @@ export default (env:any)=>{
                 init(env,`下架产品检测`)
 
                 strapi.log.info(`Product Check Start`)
-                new Crawler({env,logCallback}).start();
+                new Crawler({env,logCallback:prodCheckLogCallback}).start();
             },
             options: {
-                rule:'0 11 21 * * *',
+                rule:'0 53 21 * * *',
                 tz:'Asia/Shanghai'
             }
         }
