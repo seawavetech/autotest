@@ -34,12 +34,14 @@ export class Crawler extends Base {
                 }
             })
 
-            for(let i=0,num=0; i<this.sns.length;) {
+            for(let i=0,num=0,len=this.sns.length; i<len;) {
+                console.log(`正在检查【第${i+1}批/共${len}批】`)
                 this.curSns = this.sns[i]
                 await page.goto(this.getFakeUrl());
-                let result = await this.checkProd(page).catch(()=>false);
+                let result = await this.checkProd(page,i+1).catch(()=>false);
+                console.log(`【第${i+1}批】检查完毕，1-2分钟后检查下一批`)
 
-                await this.sleep(1*60,3*60)
+                await this.sleep(40,100)
                 
                 if(result) { i++ }
                 else if( num >= 5 ){
@@ -62,7 +64,7 @@ export class Crawler extends Base {
         }
     }
 
-    public async checkProd(page) {
+    public async checkProd(page,groupSn) {
         try {
 
             console.log('check product status')
@@ -75,14 +77,18 @@ export class Crawler extends Base {
 
             if(body.code === 200 && resProds) {
                 if(resProds.length > 0) {
-                    console.log('请求成功')
                     // console.log(this.curSns[1])
                     let prods = this.curSns.filter(i=>{
                         return !resProds.some(j=>j.pid == i[1]*1)
                     })
 
-                    prods.forEach(i=>this.rmProds.push(i))
-                    this.log('success',JSON.stringify(prods),'下架商品sn');
+                    if(prods.length > 0) {
+                        prods.forEach(i=>this.rmProds.push(i))
+                        this.log('success',JSON.stringify(prods.map(i=>i[0])),`第${groupSn}批中下架商品`);
+                    }else {
+                        console.log(`第${groupSn}批中没有下架商品`)
+                    }
+
                 }
                 return true;
             }else {
