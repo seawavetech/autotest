@@ -41,7 +41,7 @@ export class Crawler extends Base {
                 let result = await this.checkProd(page,i+1).catch(()=>false);
                 console.log(`【第${i+1}批】检查完毕，1-2分钟后检查下一批`)
 
-                await this.sleep(40,100)
+                await this.sleep(60,120)
                 
                 if(result) { i++ }
                 else if( num >= 5 ){
