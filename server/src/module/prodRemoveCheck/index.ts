@@ -74,6 +74,7 @@ export class Crawler extends Base {
             }, { timeout: 30000 }).catch();
             let body = JSON.parse(await res.text());
             let resProds = body.data?.products
+            console.log(body.data)
 
             if(body.code === 200 && resProds) {
                 if(resProds.length > 0) {
