@@ -1,6 +1,6 @@
 import TestBase from './base/test_base';
 
-import { TestClassOptions } from './base/type';
+import { TestClassOptions } from '../@type/autotest';
 
 export default class Test extends TestBase {
     constructor(opts: TestClassOptions) {
@@ -32,7 +32,7 @@ export default class Test extends TestBase {
             await this.checkProduct(page);
 
             // cart
-            await this.sleep(3000);
+            await this.sleep(3);
             await page.waitForSelector('#addCartModal a.btn-checkout',{ visible: true });
             await Promise.all([
                 page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
@@ -46,7 +46,7 @@ export default class Test extends TestBase {
                 page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
                 page.click('.btn.proceed-btn'),
             ]);
-            await this.sleep(3000);
+            await this.sleep(3);
             await this.checkCheckout(page);
 
         } catch (err) {
@@ -165,7 +165,7 @@ export default class Test extends TestBase {
             await page.waitForResponse(res => {
                 return /api\/product\/info\/\d+/i.test(res.url()) && res.status() === 200
             }, { timeout: 10000 }).catch();
-            await this.sleep(3000);
+            await this.sleep(3);
             let $selectBox = await page.waitForSelector('.select-box');
             let data:any;
             if ($selectBox) {
@@ -254,7 +254,7 @@ export default class Test extends TestBase {
             await page.type('input#address', '123 Compute Rd.', { delay: 100 });
             await page.type('input#city', 'NetOnline', { delay: 100 });
             await page.select('select#country-id', '1')
-            await this.sleep(3000);
+            await this.sleep(3);
             await page.select('select#province-id', '9');
             await page.type('input#postal', '318097', { delay: 100 });
             await page.type('input#phone', '9153643212', { delay: 100 });
@@ -266,7 +266,7 @@ export default class Test extends TestBase {
             await page.waitForSelector('.js-shipping-list li:first-child input', { visible: true })
             this.log('success', `地址保存：通过`, 'checkout')
 
-            await this.sleep(3000);
+            await this.sleep(3);
             await page.click('.js-shipping-list li:first-child input')
             await page.waitForResponse(res =>
                 /checkout\/ajaxGetShippingFee/i.test(res.url()) && res.status() === 200,
@@ -274,7 +274,7 @@ export default class Test extends TestBase {
             )
             this.log('success', `运输方式保存：通过`, 'checkout')
 
-            await this.sleep(3000);
+            await this.sleep(3);
             await page.click('.js-rush-list li:first-child input')
             await page.waitForResponse(res =>
                 /checkout\/ajaxGetRushFee/i.test(res.url()) && res.status() === 200,

@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import siteList from './site';
 
-import { ResultDataType, TestClassOptions } from './type';
+import { ResultDataType, TestClassOptions } from '../../@type/autotest';
 
 const iPhone = KnownDevices['iPhone 12'];
 const PC = {
@@ -71,7 +71,7 @@ export default abstract class Test {
             this.log('info', `本次用时：${Math.floor((new Date().getTime() - now) / 1000)}秒`);
             this.log('ctrl', 'close');
 
-            await this.sleep(10000);
+            await this.sleep(10);
             await browser.close();
         } catch (err) {
             console.info(`++++++++++++++++++++++`);

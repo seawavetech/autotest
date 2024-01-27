@@ -1,6 +1,8 @@
 
 import { Dispatch} from '../src/module/autotest';
-import { DispatchOption,ResultDataType} from '../src/module/autotest/base/type'
+import { Crawler } from '../src/module/prodRemoveCheck';
+// import { Dispatch} from '../src/module/autotest';
+import { DispatchOption,ResultDataType} from '../src/module//@type/autotest'
 import axios from 'axios';
 
 interface siteData {
@@ -58,10 +60,10 @@ function notice(){
     }).then(res=>{}).catch(err=>{})
 }
 
-function init(env:any,data:siteData){
+function init(env:any,title:string){
     url  =  env('ALARM_WEBHOOK_URL');
     msgArr = []
-    noticeTitle = `自动化测试:${data.site}-${data.platform}`
+    noticeTitle = title
 }
 
 let sites:{
@@ -112,7 +114,7 @@ let sites:{
             type: 'test',
             range: 'all',
         },
-        cron_rull:'0 20 15 * * *'
+        cron_rull:'0 40 15 * * *'
     }, {
         title: 'ebd_pc',
         info : {
@@ -121,7 +123,7 @@ let sites:{
             type: 'test',
             range: 'all',
         },
-        cron_rull:'0 30 15 * * *'
+        cron_rull:'0 50 15 * * *'
     } ]
 
 
@@ -132,7 +134,7 @@ export default (env:any)=>{
         task_cron[i.title] = {
             task: ({strapi})=>{
                 let data: siteData= i.info;
-                init(env,data)
+                init(env,`自动化测试:${data.site}-${data.platform}`)
 
                 strapi.log.info(`autotest start:${data.site}-${data.platform}`)
                 new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
@@ -145,5 +147,19 @@ export default (env:any)=>{
     })
 
     console.log('return cron tasks.')
-    return  task_cron;
+
+    return  Object.assign({},task_cron,{
+        productRemoveCheck:{
+            task: ({strapi})=>{
+                init(env,`下架产品检测`)
+
+                strapi.log.info(`Product Check Start`)
+                new Crawler({env,logCallback}).start();
+            },
+            options: {
+                rule:'0 40 20 * * *',
+                tz:'Asia/Shanghai'
+            }
+        }
+    });
 }

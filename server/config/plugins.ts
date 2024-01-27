@@ -1,6 +1,6 @@
 
 import { Dispatch} from '../src/module/autotest';
-import { DispatchOption,ResultDataType} from '../src/module/autotest/base/type'
+import { DispatchOption,ResultDataType} from '../src/module/@type/autotest'
 
 export default ({ env })=>({
     'io':{

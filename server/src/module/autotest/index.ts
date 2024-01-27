@@ -3,7 +3,7 @@
 import TestMAll from './test_all_m';
 import TestPcAll from './test_all_pc';
 
-import { DispatchOption } from './base/type';
+import { DispatchOption } from '../@type/autotest';
 
 
 export class Dispatch {

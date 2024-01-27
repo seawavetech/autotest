@@ -1,6 +1,6 @@
 import TestBase from './base/test_base';
 
-import { TestClassOptions } from './base/type';
+import { TestClassOptions } from '../@type/autotest';
 
 export default class Test extends TestBase {
     constructor(opts: TestClassOptions) {
@@ -18,7 +18,7 @@ export default class Test extends TestBase {
                 page.waitForNavigation({waitUntil:'domcontentloaded'}),
                 page.click('#app .header_inner > nav > div > a:nth-child(2)'),
             ]);
-            await this.sleep(3000);
+            await this.sleep(3)
             await this.checkCategory(page);
 
             // product
@@ -34,7 +34,7 @@ export default class Test extends TestBase {
                 console.log(err)
             });
             // console.log('after click.')
-            await this.sleep(3000);
+            await this.sleep(3);
             // console.log('after sleep.')
             await this.checkProduct(page);
 
@@ -49,7 +49,7 @@ export default class Test extends TestBase {
             await this.checkCart(page);
 
             // checkout
-            await this.sleep(2000);
+            await this.sleep(2);
             await page.waitForSelector('.right-box .btn-checkout');
             await Promise.all([
                 page.waitForNavigation({waitUntil:'domcontentloaded'}),
@@ -81,7 +81,7 @@ export default class Test extends TestBase {
             }
 
             // best sellers
-            // await this.sleep(2000);
+            // await this.sleep(2);
             // let $category2 = await page.waitForSelector('.section.s-4')
             // if ($category2) {
             //     let count = await page.evaluate(() => {
@@ -94,7 +94,7 @@ export default class Test extends TestBase {
             // }
 
             // new arrivals.
-            await this.sleep(2000);
+            await this.sleep(2);
             let $category3 = await page.waitForSelector('.new.section.s-5').catch(()=>{})
             if ($category3) {
                 let count = await page.evaluate(() => {
@@ -116,7 +116,7 @@ export default class Test extends TestBase {
 
             
             // 检查slider
-            await this.sleep(3000);
+            await this.sleep(3)
             let $slider = await page.waitForSelector('.index_slide .swiper-wrapper').catch(()=>{})
             if (!$slider) {
                 let sliderApi = `${this.apiUrl}/activity/sliders`
@@ -291,12 +291,12 @@ export default class Test extends TestBase {
             await page.type('.formItem8 input', '9153643212', { delay: 100 });
 
             await page.click('.formItem0 .v-select .vs__selected')
-            await this.sleep(2000)
+            await this.sleep(2)
             await page.click('.formItem0 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
 
-            await this.sleep(3000)
+            await this.sleep(3)
             await page.click('.formItem4 .v-select .vs__selected')
-            await this.sleep(2000)
+            await this.sleep(2)
             await page.click('.formItem4 .v-select ul[id*="__listbox"] .vs__dropdown-option:nth-child(1)')
   
 
@@ -306,7 +306,7 @@ export default class Test extends TestBase {
             await page.waitForSelector('.address-list input[name="address_item"]', { visible: true })
             this.log('success', `地址保存：通过`, 'checkout')
 
-            await this.sleep(3000);
+            await this.sleep(3);
             await page.click('.s-shipping #shippingups')
             let shippingApiRE = /checkout\/ajaxGetShippingFee/i;
             await page.waitForResponse(res =>{
@@ -314,7 +314,7 @@ export default class Test extends TestBase {
             },{ timeout: 10000 })
             this.log('success', `运输方式保存：通过`, 'checkout')
 
-            await this.sleep(3000);
+            await this.sleep(3);
             let rushLength = await page.evaluate(()=>{
                 let items = document.querySelectorAll('.s-shipping .date-list .item');
                 return items.length;
@@ -349,7 +349,7 @@ export default class Test extends TestBase {
             for(let i=0;i<data.length;i++){
                 let obj=data[i];
                 this.log('success',`${obj.key}:  ${obj.val}`,'checkout')
-                await this.sleep(1000);
+                await this.sleep(1);
             }
             
 
