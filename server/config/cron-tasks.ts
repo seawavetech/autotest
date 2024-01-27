@@ -193,7 +193,7 @@ export default (env:any)=>{
                 new Crawler({env,logCallback:prodCheckLogCallback}).start();
             },
             options: {
-                rule:'0 53 21 * * *',
+                rule:'0 56 21 * * *',
                 tz:'Asia/Shanghai'
             }
         }
