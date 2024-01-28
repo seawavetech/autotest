@@ -52,15 +52,18 @@ export class Crawler extends Base {
                 }
             }
 
-            // if(this.rmProds.length > 1) {
-            //     this.rmProds.map(i=>{
-            //         let url = this.url+`/simple-a-line-neckline-jersey-p${i[0]}.html`
-            //         this.log('success',url,'下架商品url');
-            //     })
-            // }
         } catch (err) {
             this.log('error', 'Status: faild in queue.')
             console.log(err);
+        }
+
+        
+        if(this.rmProds.length > 1) {
+            this.log('success',JSON.stringify(this.rmProds.map(i=>i[0])),'下架商品sn');
+
+            // this.rmProds.map(i=>{
+            //     let url = this.url+`/simple-a-line-neckline-jersey-p${i[0]}.html`
+            // })
         }
     }
 
@@ -84,7 +87,7 @@ export class Crawler extends Base {
 
                     if(prods.length > 0) {
                         prods.forEach(i=>this.rmProds.push(i))
-                        this.log('success',JSON.stringify(prods.map(i=>i[0])),`第${groupSn}批中下架商品`);
+                        // this.log('success',JSON.stringify(prods.map(i=>i[0])),`第${groupSn}批中下架商品`);
                         console.log(`第${groupSn}批中下架商品`,JSON.stringify(prods.map(i=>i[0])));
                     }else {
                         console.log(`第${groupSn}批中没有下架商品`)
