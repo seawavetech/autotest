@@ -191,7 +191,7 @@ export default (env:any)=>{
                 prodCheckLogCallback({
                     type: 'success',
                     message: '开始检查下架商品',
-                    info:'none'
+                    info:''
                 })
                 strapi.log.info(`Product Check Start`)
                 new Crawler({env,logCallback:prodCheckLogCallback}).start();
