@@ -317,7 +317,13 @@ export default class Test extends TestBase {
             await this.sleep(3);
             let rushLength = await page.evaluate(()=>{
                 let items = document.querySelectorAll('.s-shipping .date-list .item');
-                return items.length;
+                let count = 0;
+                items.forEach(i=>{
+                    if(!i.classList.contains('disabled')) {
+                        count++
+                    }
+                })
+                return count;
             })
             if(rushLength > 1) {
                 await page.click('.s-shipping .date-list .item:nth-child(1) input')
@@ -331,7 +337,7 @@ export default class Test extends TestBase {
                 })
                 this.log('success', `加急选择：通过`, 'checkout')
             }else {
-                this.log('success', `加急选择项数量：${rushLength}`, 'checkout')
+                this.log('success', `加急选择项有效数量：${rushLength}`, 'checkout')
             }
 
             let data=await page.evaluate(()=>{
