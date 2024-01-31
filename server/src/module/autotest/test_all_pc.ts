@@ -157,7 +157,7 @@ export default class Test extends TestBase {
             }
 
         } catch (err) {
-            this.log('error', `首页获取异常`, 'index')
+            this.log('error', `首页获取异常\n${err}`, 'index')
             console.log(err);
         }
     }
@@ -178,7 +178,7 @@ export default class Test extends TestBase {
             }
 
         } catch (err) {
-            this.log('error', `获取异常`, 'category')
+            this.log('error', `获取异常\n${err}`, 'category')
         }
         return
     }
@@ -238,7 +238,7 @@ export default class Test extends TestBase {
             );
             this.log('success', `加购-->加入购物车：通过`, 'product')
         } catch (err) {
-            this.log('error', `页面异常`, 'product')
+            this.log('error', `页面异常\n${err}`, 'product')
         }
     }
 
@@ -265,7 +265,7 @@ export default class Test extends TestBase {
                 this.log('error', `未获取到数据`, 'cart')
             }
         } catch (err) {
-            this.log('error', `页面异常`, 'cart')
+            this.log('error', `页面异常\n${err}`, 'cart')
         }
 
     }
@@ -326,7 +326,9 @@ export default class Test extends TestBase {
                 await page.waitForResponse(res =>
                     rushApiRE.test(res.url()) && res.status() === 200,
                     { timeout: 10000 }
-                )
+                ).catch((err)=>{
+                    this.log('error', `加急费接口未返回\n${err}`, 'checkout')
+                })
                 this.log('success', `加急选择：通过`, 'checkout')
             }else {
                 this.log('success', `加急选择项数量：${rushLength}`, 'checkout')
@@ -351,13 +353,23 @@ export default class Test extends TestBase {
                 this.log('success',`${obj.key}:  ${obj.val}`,'checkout')
                 await this.sleep(1);
             }
+
+            let subMitBtnIsDisabled = await page.evaluate(()=>{
+                let formItem = document.querySelector('.right-box .btn-checkout');
+                let isDisabled = formItem.classList.contains('disabled');
+
+                return isDisabled;
+            })
+
+            this.log(`${subMitBtnIsDisabled?'error':'info'}`,`Place Order按钮最终状态为${subMitBtnIsDisabled?'不':''}可点击`,'checkout')
             
 
             // 提交订单
+            
 
 
         } catch (err) {
-            this.log('error', `页面异常`, 'checkout')
+            this.log('error', `页面异常\n${err}`, 'checkout')
         }
     }
 }

@@ -16,12 +16,12 @@ interface siteData {
 let url = ''
 let noticeTitle = ''
 let msgArr:ResultDataType[] | ProdCheckResultData[] = []
-let logCallback = (data:ResultDataType):void=>{
+let testLogCallback = (data:Required<ResultDataType>):void=>{
 
     switch (data.type) {
         case 'ctrl':
             if (data.message === 'close') {
-                let textArr = msgArr.map(i=>{
+                let textArr = (msgArr as ResultDataType[]).filter((i:ResultDataType)=>i.type!=='success').map((i:ResultDataType)=>{
                     let str = `状态:${i.type} | 位置：${i.position}`;
                     if(i.message) {
                         str += ` | 信息：${i.message}`
@@ -173,7 +173,7 @@ export default (env:any)=>{
                 init(env,`自动化测试:${data.site}-${data.platform}`)
 
                 strapi.log.info(`autotest start:${data.site}-${data.platform}`)
-                new Dispatch(Object.assign({}, data, { strapi,env,logCallback }));
+                new Dispatch(Object.assign({}, data, { strapi,env,logCallback:testLogCallback }));
             },
             options: {
                 rule:i.cron_rull,
