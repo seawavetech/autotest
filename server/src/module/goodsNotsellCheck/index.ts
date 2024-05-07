@@ -23,10 +23,10 @@ export class Crawler extends Base {
 
             /* 请求中拦截并调包pids */
             page.on('request', async req=>{
-                if(req.url().match('api/products') && req.method().toUpperCase() === 'POST'){
+                if(req.url().match('api/product/batch/info') && req.method().toUpperCase() === 'POST'){
                     let pids = this.curSns.map(i => i[1]*1)
 
-                    let postData = JSON.stringify({pids:pids,scene:"category"})
+                    let postData = JSON.stringify({pids})
                     await this.sleep(6)
                     req.continue({postData});
                 }else {
@@ -73,7 +73,7 @@ export class Crawler extends Base {
             console.log('check product status')
             //检查
             let res = await page.waitForResponse(res => {
-                return /api\/products/i.test(res.url()) && res.status() === 200
+                return /\/product\/batch\/info/i.test(res.url()) && res.status() === 200
             }, { timeout: 30000 }).catch();
             let body = JSON.parse(await res.text());
             let resProds = body.data?.products
