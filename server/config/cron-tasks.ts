@@ -78,9 +78,6 @@ let prodCheckLogCallback = (data:ProdCheckResultData):void=>{
 
 
 function notice(textArr){
-
-    return;
-
     axios.post(url, {
         "msg_type": "post",
         "content": {
@@ -199,7 +196,7 @@ export default (env:any)=>{
                 new Crawler({env,logCallback:prodCheckLogCallback}).start();
             },
             options: {
-                rule:'0 47 17 * * *',
+                rule:'0 40 2 * * *',
                 tz:'Asia/Shanghai'
             }
         }
