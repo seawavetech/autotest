@@ -253,7 +253,7 @@ export default class Test extends TestBase {
             await page.type('input#last-name', 'Test', { delay: 100 });
             await page.type('input#address', '123 Compute Rd.', { delay: 100 });
             await page.type('input#city', 'NetOnline', { delay: 100 });
-            await page.select('select#country-id', '1')
+            // await page.select('select#country-id', '1')
             await this.sleep(3);
             await page.select('select#province-id', '9');
             await page.type('input#postal', '318097', { delay: 100 });
@@ -267,7 +267,7 @@ export default class Test extends TestBase {
             this.log('success', `地址保存：通过`, 'checkout')
 
             await this.sleep(3);
-            await page.click('.js-shipping-list li:first-child input')
+            await page.click('.js-shipping-list li:not(.hide) input')
             await page.waitForResponse(res =>
                 /checkout\/ajaxGetShippingFee/i.test(res.url()) && res.status() === 200,
                 { timeout: 10000 }
@@ -275,7 +275,7 @@ export default class Test extends TestBase {
             this.log('success', `运输方式保存：通过`, 'checkout')
 
             await this.sleep(3);
-            await page.click('.js-rush-list li:first-child input')
+            await page.click('.js-rush-list li input')
             await page.waitForResponse(res =>
                 /checkout\/ajaxGetRushFee/i.test(res.url()) && res.status() === 200,
                 { timeout: 10000 }
@@ -283,6 +283,16 @@ export default class Test extends TestBase {
             this.log('success', `加急选择：通过`, 'checkout')
 
             await page.click('.js-shipping-continue');
+
+            let subMitBtnIsDisabled = await page.evaluate(()=>{
+                let formItem = document.querySelector('.btn-place-order');
+                let isDisabled = formItem.classList.contains('disabled');
+
+                return isDisabled;
+            })
+
+            this.log(`${subMitBtnIsDisabled?'error':'info'}`,`Place Order按钮最终状态为${subMitBtnIsDisabled?'不':''}可点击`,'checkout')
+            
 
             // 提交订单
 

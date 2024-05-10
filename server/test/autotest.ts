@@ -17,6 +17,7 @@ let noticeTitle = ''
 let msgArr: ResultDataType[] | ProdCheckResultData[] = []
 let testLogCallback = (data: Required<ResultDataType>): void => {
 
+    console.log(data);
     switch (data.type) {
         case 'ctrl':
             if (data.message === 'close') {
