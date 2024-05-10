@@ -39,17 +39,22 @@ export class Crawler extends Base {
                 this.curSns = this.sns[i]
                 await page.goto(this.getFakeUrl());
                 let result = await this.checkProd(page,i+1).catch(()=>false);
-
-                console.log(`【第${i+1}批】检查完毕，1-2分钟后检查下一批`)
-                await this.sleep(60,120)
                 
-                if(result) { i++ }
-                else if( num >= 5 ){
+                /* 出错尝试 5 次 */
+                if(result) { 
+                    i++;
+                    console.log(`【第${i+1}批】检查完毕，稍后检查下一批`)
+                }else if( num >= 5 ){
                     num=0;
-                    i++
+                    i++;
+                    console.log(`【第${i+1}批】检查尝试5次失败，稍后检查下一批`)
+                    this.log('error', `第${i+1}/${len}批-获取异常`, 'check product.')
                 }else {
-                    num += 1
+                    num += 1;
+                    console.log(`【第${i+1}批】第${num}次检查失败，稍后重试`)
                 }
+
+                await this.sleep(61,120)
             }
 
         } catch (err) {
@@ -94,16 +99,16 @@ export class Crawler extends Base {
                     }
 
                 }else {
-                    console.log('接口返回的产品数量为0')
+                    console.log(`第${groupSn}批-接口返回的产品数量为0`)
                 }
 
                 return true;
             }else {
-                console.log('请求产品更新接口失败')
+                console.log(`第${groupSn}批-请求产品更新接口失败`)
                 return false
             }
         } catch (err) {
-            this.log('error', `获取异常`, 'check product.')
+            console.log(`第${groupSn}批-获取异常`);
             console.log(err);
             return false
         }

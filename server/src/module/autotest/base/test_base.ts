@@ -36,6 +36,7 @@ export default abstract class Test {
         this.headless = opts.env.bool('PUPPETEER_HEADLESS', true);
         this.browserPath = opts.env('CHROMIUM_PATH', '');
         this.logCallback = opts.logCallback;
+        console.log('this.headless = ',this.headless)
     }
 
     public async start() {

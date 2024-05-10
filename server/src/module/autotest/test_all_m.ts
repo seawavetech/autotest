@@ -288,7 +288,7 @@ export default class Test extends TestBase {
 
 
         } catch (err) {
-            this.log('error', `页面异常`, 'cart')
+            this.log('error', `页面异常`, 'checkout')
         }
     }
 }
