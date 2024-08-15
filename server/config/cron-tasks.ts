@@ -78,6 +78,7 @@ let prodCheckLogCallback = (data:ProdCheckResultData):void=>{
 
 
 function notice(textArr){
+    if(!url) return
     axios.post(url, {
         "msg_type": "post",
         "content": {
@@ -96,7 +97,7 @@ function notice(textArr){
 }
 
 function init(env:any,title:string){
-    url  =  env('ALARM_WEBHOOK_URL');
+    url  =  env('ALARM_WEBHOOK_URL','');
     msgArr = []
     noticeTitle = title
 }

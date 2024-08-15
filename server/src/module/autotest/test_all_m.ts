@@ -176,7 +176,7 @@ export default class Test extends TestBase {
                     是否是库存商品
                     分别处理两种商品的加购过程
                     */
-                    let titleEl = document.querySelector('.prod-title span:nth-child(2)');
+                    let titleEl = document.querySelector('.prod-title span');
                     let colorList = document.querySelectorAll('.select-color ul.color-list > li a');
                     let sizeList = document.querySelectorAll('.select-size .size-list-wrap ul > li:not(.empty-li)');
                     let selectBoxes = document.querySelectorAll('.select-box');
