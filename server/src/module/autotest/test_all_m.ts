@@ -268,18 +268,16 @@ export default class Test extends TestBase {
 
             await this.sleep(3);
             await page.click('.js-shipping-list li:not(.hide) input')
-            await page.waitForResponse(res =>
-                /checkout\/ajaxGetShippingFee/i.test(res.url()) && res.status() === 200,
-                { timeout: 10000 }
-            )
+            await page.waitForResponse(res =>{
+                return /checkout\/ajaxGetShippingFee/i.test(res.url()) && res.status() === 200
+            },{ timeout: 10000 })
             this.log('success', `运输方式保存：通过`, 'checkout')
 
             await this.sleep(3);
-            await page.click('.js-rush-list li input')
-            await page.waitForResponse(res =>
-                /checkout\/ajaxGetRushFee/i.test(res.url()) && res.status() === 200,
-                { timeout: 10000 }
-            )
+            await page.click('.js-rush-list li')
+            await page.waitForResponse(res => {
+                return /checkout\/ajaxGetRushFee/i.test(res.url()) && res.status() === 200
+            },{ timeout: 10000 })
             this.log('success', `加急选择：通过`, 'checkout')
 
             await page.click('.js-shipping-continue');
@@ -298,6 +296,7 @@ export default class Test extends TestBase {
 
 
         } catch (err) {
+            console.log(err);
             this.log('error', `页面异常`, 'checkout')
         }
     }

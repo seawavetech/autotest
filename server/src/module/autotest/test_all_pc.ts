@@ -22,7 +22,7 @@ export default class Test extends TestBase {
             await this.checkCategory(page);
 
             // product
-            let target = '#app .p-list-main .p-list .p-item:nth-child(4) a';
+            let target = '#app .p-list-main .p-list .p-item:nth-child(2) a';
             await page.evaluate(selector=>{
                 let el:HTMLElement=document.querySelector(selector);
                 el.removeAttribute('target');
