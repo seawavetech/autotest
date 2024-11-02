@@ -28,13 +28,13 @@ export default class Test extends TestBase {
                 el.removeAttribute('target');
             },target)
             await Promise.all([
-                page.waitForNavigation({waitUntil:'domcontentloaded'}),
+                page.waitForNavigation({waitUntil:'load'}),
                 page.click(target),
             ]).catch((err)=>{
                 console.log(err)
             });
             // console.log('after click.')
-            await this.sleep(3);
+            await this.sleep(5);
             // console.log('after sleep.')
             await this.checkProduct(page);
 
