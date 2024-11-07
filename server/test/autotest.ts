@@ -4,6 +4,7 @@ import { Crawler } from '../src/module/prodRemoveCheck';
 import { DispatchOption, ResultDataType } from '../src/module//@type/autotest'
 import { ResultDataType as ProdCheckResultData } from '../src/module//@type/prodRemoveCheck'
 import axios from 'axios';
+import dotenv from 'dotenv';
 
 interface siteData {
     site: DispatchOption['site'];
@@ -11,6 +12,8 @@ interface siteData {
     type: DispatchOption['type'];
     range: DispatchOption['range'];
 }
+
+const sysEnv = dotenv.config({path:'../.env'}).parsed;
 
 let url = ''
 let noticeTitle = ''
@@ -107,8 +110,8 @@ let sites = {
 }
 
 let config = {
-    "PUPPETEER_HEADLESS": false,
-    "CHROMIUM_PATH":''
+    "PUPPETEER_HEADLESS": sysEnv.PUPPETEER_HEADLESS === 'true',
+    "CHROMIUM_PATH":sysEnv.CHROMIUM_PATH
 }
 
 function env(k: string, v: any) {
