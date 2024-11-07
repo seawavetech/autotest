@@ -123,4 +123,4 @@ function test(data: any) {
     new Dispatch(Object.assign({}, data, { strapi, env, logCallback: testLogCallback }));
 }
 
-test(sites['dad_m'])
+test(sites['dad_pc'])

@@ -20,27 +20,22 @@ export default class Test extends TestBase {
             ]);
             await this.sleep(3)
             await this.checkCategory(page);
+            await this.sleep(5)
 
             // product
             let target = '#app .p-list-main .p-list .p-item:nth-child(2) a';
-            await page.evaluate(selector=>{
+            let prodUrl = await page.evaluate(selector=>{
                 let el:HTMLElement=document.querySelector(selector);
-                el.removeAttribute('target');
+                return el.getAttribute('href');
             },target)
-            await Promise.all([
-                page.waitForNavigation({waitUntil:'load'}),
-                page.click(target),
-            ]).catch((err)=>{
-                console.log(err)
-            });
-            // console.log('after click.')
-            await this.sleep(5);
-            // console.log('after sleep.')
+
+            console.log(prodUrl);
+            await page.goto(prodUrl,{waitUntil:'domcontentloaded'});
+
+            await this.sleep(3);
             await this.checkProduct(page);
 
-            // cart
-            // console.log('cart test.')
-            
+            // cart            
             await page.waitForSelector('.header_inner .s-bag a.btn-checkout');
             await Promise.all([
                 page.waitForNavigation({waitUntil:'domcontentloaded'}),
